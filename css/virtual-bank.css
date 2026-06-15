@@ -1,0 +1,21 @@
+.virtual-bank-panel {
+  border: 1px solid rgba(49, 87, 246, .16);
+}
+
+.virtual-bank-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  gap: 12px;
+  align-items: end;
+  margin-top: 14px;
+}
+
+.virtual-bank-grid button {
+  min-height: 48px;
+}
+
+@media (max-width: 760px) {
+  .virtual-bank-grid {
+    grid-template-columns: 1fr;
+  }
+}
