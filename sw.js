@@ -1,17 +1,19 @@
-const CACHE_NAME = 'english-reading-trainer-v8-mixed-questions';
+const CACHE_NAME = 'english-reading-trainer-v9-advanced-types';
 const APP_ASSETS = [
   './',
   './index.html',
-  './css/style.css?v=mixed-questions-20260616',
-  './css/mixed-questions.css?v=mixed-questions-20260616',
-  './js/passages.js?v=mixed-questions-20260616',
-  './js/manual-passages.js?v=mixed-questions-20260616',
-  './js/generated-passages.js?v=mixed-questions-20260616',
-  './js/curated-passages.js?v=mixed-questions-20260616',
-  './js/activate-generated-bank.js?v=mixed-questions-20260616',
-  './js/app.js?v=mixed-questions-20260616',
-  './manifest.json?v=mixed-questions-20260616',
-  './icons/icon.svg?v=mixed-questions-20260616'
+  './css/style.css?v=advanced-types-20260616',
+  './css/mixed-questions.css?v=advanced-types-20260616',
+  './js/passages.js?v=advanced-types-20260616',
+  './js/manual-passages.js?v=advanced-types-20260616',
+  './js/generated-passages.js?v=advanced-types-20260616',
+  './js/curated-passages.js?v=advanced-types-20260616',
+  './js/activate-generated-bank.js?v=advanced-types-20260616',
+  './js/advanced-question-types.js?v=advanced-types-20260616',
+  './js/app.js?v=advanced-types-20260616',
+  './js/question-type-labels.js?v=advanced-types-20260616',
+  './manifest.json?v=advanced-types-20260616',
+  './icons/icon.svg?v=advanced-types-20260616'
 ];
 
 self.addEventListener('install', (event) => {
