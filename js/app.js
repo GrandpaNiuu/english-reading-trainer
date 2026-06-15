@@ -17,16 +17,29 @@ const app = {
 const $ = (id) => document.getElementById(id);
 
 function boot() {
-  app.passages = [...(window.PASSAGES || []), ...readJson(STORE.custom, [])];
+  app.passages = normalizePassages([...(window.PASSAGES || []), ...readJson(STORE.custom, [])]);
   bind();
+  renderLibrarySummary();
+  populateTopicFilter();
+  $('categoryFilter').value = 'curated';
   renderCards(true);
   renderHistory();
   initPwa();
 }
 
+function normalizePassages(passages) {
+  return passages.map((p) => ({
+    ...p,
+    category: getCategory(p)
+  }));
+}
+
 function bind() {
+  $('categoryFilter').addEventListener('change', () => renderCards(true));
   $('levelFilter').addEventListener('change', () => renderCards(true));
+  $('topicFilter').addEventListener('change', () => renderCards(true));
   $('searchInput').addEventListener('input', () => renderCards(true));
+  $('resetFiltersBtn').addEventListener('click', resetFilters);
   $('randomBtn').addEventListener('click', randomPassage);
   $('backToHomeBtn').addEventListener('click', home);
   $('resultBackBtn').addEventListener('click', home);
@@ -40,26 +53,121 @@ function bind() {
   $('installBtn').addEventListener('click', installSiteApp);
 }
 
+function getCategory(p) {
+  const source = String(p.source || '').toLowerCase();
+  const quality = String(p.quality || '').toLowerCase();
+  if (source.includes('curated') || quality.includes('curated')) return 'curated';
+  if (source.includes('custom')) return 'custom';
+  if (source.includes('generated') || source.includes('10000')) return 'generated';
+  return 'manual';
+}
+
+function categoryLabel(category) {
+  return {
+    curated: '精选强化',
+    generated: '基础大题库',
+    manual: '人工样例',
+    custom: '自定义导入'
+  }[category] || '未知题库';
+}
+
+function categoryDescription(category) {
+  return {
+    curated: '优先练习：结构更完整，7 道题，含主旨、推理、词义、结构题。',
+    generated: '大量刷题：10000 篇原创生成题库，适合按难度和主题反复训练。',
+    manual: '快速测试：少量人工样例文章，用于检查功能和基础练习。',
+    custom: '你导入的文章：保存在当前浏览器中。'
+  }[category] || '';
+}
+
+function renderLibrarySummary() {
+  const box = $('librarySummary');
+  box.textContent = '';
+  const counts = countByCategory();
+  const cards = [
+    ['curated', counts.curated || 0],
+    ['generated', counts.generated || 0],
+    ['manual', counts.manual || 0],
+    ['custom', counts.custom || 0]
+  ];
+
+  cards.forEach(([category, count]) => {
+    const button = document.createElement('button');
+    button.className = `category-card ${category}`;
+    button.type = 'button';
+    button.addEventListener('click', () => {
+      $('categoryFilter').value = category;
+      renderCards(true);
+      document.getElementById('homeView').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+
+    const label = document.createElement('span');
+    label.className = 'category-label';
+    label.textContent = categoryLabel(category);
+    const number = document.createElement('strong');
+    number.textContent = count;
+    const desc = document.createElement('small');
+    desc.textContent = categoryDescription(category);
+    button.append(label, number, desc);
+    box.appendChild(button);
+  });
+}
+
+function countByCategory() {
+  return app.passages.reduce((acc, p) => {
+    acc[p.category] = (acc[p.category] || 0) + 1;
+    return acc;
+  }, {});
+}
+
+function populateTopicFilter() {
+  const topics = [...new Set(app.passages.map((p) => p.topic).filter(Boolean))].sort((a, b) => a.localeCompare(b));
+  const select = $('topicFilter');
+  select.innerHTML = '<option value="all">全部主题</option>';
+  topics.forEach((topic) => {
+    const option = document.createElement('option');
+    option.value = topic;
+    option.textContent = topic;
+    select.appendChild(option);
+  });
+}
+
+function resetFilters() {
+  $('categoryFilter').value = 'curated';
+  $('levelFilter').value = 'all';
+  $('topicFilter').value = 'all';
+  $('searchInput').value = '';
+  renderCards(true);
+}
+
 function renderCards(resetLimit = false) {
   if (resetLimit) app.visibleLimit = 60;
+  const category = $('categoryFilter').value;
   const level = $('levelFilter').value;
+  const topic = $('topicFilter').value;
   const query = $('searchInput').value.trim().toLowerCase();
   const grid = $('passageGrid');
   grid.textContent = '';
 
-  app.filtered = app.passages.filter((p) => {
-    const okLevel = level === 'all' || p.level === level;
-    const text = `${p.title} ${p.topic || ''} ${p.level} ${p.source || ''}`.toLowerCase();
-    return okLevel && (!query || text.includes(query));
-  });
+  app.filtered = app.passages
+    .filter((p) => {
+      const okCategory = category === 'all' || p.category === category;
+      const okLevel = level === 'all' || p.level === level;
+      const okTopic = topic === 'all' || p.topic === topic;
+      const text = `${p.title} ${p.topic || ''} ${p.level} ${p.source || ''} ${p.category || ''}`.toLowerCase();
+      return okCategory && okLevel && okTopic && (!query || text.includes(query));
+    })
+    .sort(sortPassages);
 
   const shown = app.filtered.slice(0, app.visibleLimit);
-  $('passageCount').textContent = `${app.filtered.length} 篇文章，当前显示 ${shown.length} 篇`;
+  const label = category === 'all' ? '全部题库' : categoryLabel(category);
+  $('passageCount').textContent = `${label}：${app.filtered.length} 篇文章，当前显示 ${shown.length} 篇`;
+  updateActiveCategoryCards(category);
 
   if (!shown.length) {
     const empty = document.createElement('p');
-    empty.className = 'muted';
-    empty.textContent = '没有找到符合条件的文章。';
+    empty.className = 'muted empty-state';
+    empty.textContent = '没有找到符合条件的文章。可以重置筛选，或换一个主题/难度。';
     grid.appendChild(empty);
     return;
   }
@@ -80,12 +188,37 @@ function renderCards(resetLimit = false) {
   }
 }
 
+function sortPassages(a, b) {
+  const priority = { curated: 1, manual: 2, generated: 3, custom: 4 };
+  const pa = priority[a.category] || 9;
+  const pb = priority[b.category] || 9;
+  if (pa !== pb) return pa - pb;
+  return String(a.title).localeCompare(String(b.title));
+}
+
+function updateActiveCategoryCards(active) {
+  document.querySelectorAll('.category-card').forEach((card) => {
+    card.classList.toggle('active', card.classList.contains(active));
+  });
+}
+
 function createCard(p) {
   const card = document.createElement('article');
-  card.className = 'passage-card';
+  card.className = `passage-card ${p.category}`;
+
+  const tags = document.createElement('div');
+  tags.className = 'card-tags';
   const level = document.createElement('span');
   level.className = 'level-pill';
   level.textContent = p.level;
+  const source = document.createElement('span');
+  source.className = `source-pill ${p.category}`;
+  source.textContent = categoryLabel(p.category);
+  const topic = document.createElement('span');
+  topic.className = 'topic-pill';
+  topic.textContent = p.topic || 'general';
+  tags.append(level, source, topic);
+
   const title = document.createElement('h3');
   title.textContent = p.title;
   const preview = document.createElement('p');
@@ -100,7 +233,7 @@ function createCard(p) {
   btn.textContent = '开始';
   btn.addEventListener('click', () => openPassage(p.id));
   footer.append(meta, btn);
-  card.append(level, title, preview, footer);
+  card.append(tags, title, preview, footer);
   return card;
 }
 
@@ -111,7 +244,7 @@ function openPassage(id) {
   app.current = p;
   app.elapsed = 0;
   $('timerDisplay').textContent = formatTime(0);
-  $('practiceLevel').textContent = p.level;
+  $('practiceLevel').textContent = `${p.level} · ${categoryLabel(p.category)}`;
   $('practiceTitle').textContent = p.title;
   $('practiceMeta').textContent = `${p.topic || 'general'} · ${p.word_count || countWords(p.passage)} words · ${p.questions.length} 题`;
   $('passageText').textContent = p.passage;
@@ -313,13 +446,17 @@ function importPassages() {
     setImportMessage('导入失败：请检查 JSON 格式。', true);
     return;
   }
+  const incoming = parsed.map((p) => ({ ...p, source: p.source || 'custom_imported' }));
   const current = readJson(STORE.custom, []);
   const map = new Map(current.map((x) => [x.id, x]));
-  parsed.forEach((x) => map.set(x.id, x));
+  incoming.forEach((x) => map.set(x.id, x));
   localStorage.setItem(STORE.custom, JSON.stringify([...map.values()]));
-  app.passages = [...(window.PASSAGES || []), ...readJson(STORE.custom, [])];
+  app.passages = normalizePassages([...(window.PASSAGES || []), ...readJson(STORE.custom, [])]);
   $('importText').value = '';
   setImportMessage(`导入成功：${parsed.length} 篇。`, false);
+  renderLibrarySummary();
+  populateTopicFilter();
+  $('categoryFilter').value = 'custom';
   renderCards(true);
 }
 
@@ -339,8 +476,10 @@ function validPassage(p) {
 
 function clearCustom() {
   localStorage.removeItem(STORE.custom);
-  app.passages = [...(window.PASSAGES || [])];
+  app.passages = normalizePassages([...(window.PASSAGES || [])]);
   setImportMessage('自定义题库已清空。', false);
+  renderLibrarySummary();
+  populateTopicFilter();
   renderCards(true);
 }
 
