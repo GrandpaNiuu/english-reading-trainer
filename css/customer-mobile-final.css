@@ -1,0 +1,147 @@
+.app-header > div:first-child::after,
+.app-header [class*="passage"],
+.app-header [class*="badge"] {
+  display: none !important;
+}
+
+body.modern-app-shell {
+  background: #f6f7fb;
+}
+
+.modern-app-shell .app-header {
+  max-width: 1040px;
+  grid-template-columns: 1fr;
+  padding: 14px 14px 6px;
+}
+
+.modern-app-shell .app-header > div:first-child {
+  border-radius: 28px !important;
+  padding: 22px !important;
+  box-shadow: 0 16px 42px rgba(15, 23, 42, .08) !important;
+}
+
+.modern-app-shell .header-actions {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  min-width: 0 !important;
+  gap: 10px !important;
+}
+
+.modern-app-shell .header-actions button {
+  min-height: 46px;
+  border-radius: 18px !important;
+}
+
+.modern-app-shell .container {
+  max-width: 1040px;
+}
+
+.modern-app-shell .quick-start-panel {
+  border-radius: 32px !important;
+  padding: 24px !important;
+  min-height: 250px;
+}
+
+.modern-app-shell .quick-action-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.modern-app-shell .stats-panel[data-app-section="home"] {
+  display: none !important;
+}
+
+.modern-app-shell .library-summary-panel[data-app-section="home"] {
+  display: none !important;
+}
+
+.modern-app-shell .passage-card .muted,
+.modern-app-shell #practiceMeta,
+.modern-app-shell #practiceModeNote {
+  font-size: 13px;
+}
+
+.modern-app-shell #passageCount {
+  color: #667085 !important;
+  font-size: 14px;
+}
+
+.modern-app-shell .app-bottom-nav {
+  width: min(520px, calc(100% - 24px)) !important;
+  bottom: 14px !important;
+}
+
+@media (max-width: 760px) {
+  .modern-app-shell .app-header {
+    padding: 10px 10px 4px;
+  }
+
+  .modern-app-shell .app-header > div:first-child {
+    padding: 18px !important;
+    border-radius: 24px !important;
+  }
+
+  .modern-app-shell .app-header h1 {
+    font-size: 30px !important;
+    line-height: 1.08 !important;
+  }
+
+  .modern-app-shell .app-header .subtitle {
+    font-size: 13px !important;
+  }
+
+  .modern-app-shell .header-actions {
+    grid-template-columns: 1fr 1fr !important;
+  }
+
+  .modern-app-shell #importToggleBtn {
+    grid-column: 1 / -1;
+  }
+
+  .modern-app-shell .quick-start-panel {
+    padding: 18px !important;
+    border-radius: 26px !important;
+  }
+
+  .modern-app-shell .quick-hero h2 {
+    font-size: 28px !important;
+  }
+
+  .modern-app-shell .quick-hero p {
+    font-size: 14px;
+  }
+
+  .modern-app-shell .quick-action-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .modern-app-shell .quick-action-card {
+    min-height: 108px;
+    padding: 13px;
+  }
+
+  .modern-app-shell .quick-action-card strong {
+    font-size: 17px;
+  }
+
+  .modern-app-shell .container {
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-bottom: 96px;
+  }
+
+  .modern-app-shell .panel {
+    border-radius: 24px !important;
+  }
+
+  .modern-app-shell .app-bottom-nav {
+    bottom: 8px !important;
+    width: calc(100% - 14px) !important;
+    border-radius: 22px !important;
+  }
+}
+
+@media (max-width: 420px) {
+  .modern-app-shell .quick-action-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
