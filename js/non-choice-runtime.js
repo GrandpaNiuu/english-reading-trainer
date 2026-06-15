@@ -21,19 +21,19 @@ renderQuestions = function renderQuestions(p) {
       hint.className = 'question-hint';
       hint.textContent = '可多选。';
       box.appendChild(hint);
-    } else if (q.type === 'matching') {
+    } else if (q.type === 'matching' || q.type === 'matching_headings' || q.type === 'matching_information') {
       box.appendChild(renderMatching(q));
     } else if (q.type === 'ordering') {
       box.appendChild(renderOrdering(q));
-    } else if (q.type === 'table_completion') {
+    } else if (q.type === 'table_completion' || q.type === 'flow_chart_completion') {
       box.appendChild(renderTableCompletion(q));
-    } else if (q.type === 'fill_blank' || q.type === 'summary_completion' || q.type === 'reference') {
+    } else if (['fill_blank', 'summary_completion', 'reference', 'reference_question', 'ielts_summary_completion'].includes(q.type)) {
       const input = document.createElement('input');
       input.className = 'text-answer-input';
       input.name = `q_${q.id}`;
       input.placeholder = '输入答案';
       box.appendChild(input);
-    } else if (['short_answer', 'evidence', 'application', 'keyword_extraction', 'summary_writing', 'paraphrase'].includes(q.type)) {
+    } else if (['short_answer', 'evidence', 'application', 'keyword_extraction', 'summary_writing', 'paraphrase', 'exam_short_answer'].includes(q.type)) {
       const textarea = document.createElement('textarea');
       textarea.className = 'short-answer-input';
       textarea.name = `q_${q.id}`;
@@ -127,10 +127,10 @@ getAnswer = function getAnswer(id, type) {
   if (type === 'multi_select') {
     return [...document.querySelectorAll(`input[name="q_${id}"]:checked`)].map((item) => item.value).sort();
   }
-  if (type === 'matching' || type === 'ordering' || type === 'table_completion') {
+  if (['matching', 'matching_headings', 'matching_information', 'ordering', 'table_completion', 'flow_chart_completion'].includes(type)) {
     return [...document.querySelectorAll(`[name^="q_${id}_"]`)].map((item) => item.value.trim());
   }
-  if (['fill_blank', 'short_answer', 'summary_completion', 'reference', 'evidence', 'application', 'keyword_extraction', 'summary_writing', 'paraphrase'].includes(type)) {
+  if (['fill_blank', 'short_answer', 'summary_completion', 'reference', 'evidence', 'application', 'keyword_extraction', 'summary_writing', 'paraphrase', 'reference_question', 'ielts_summary_completion', 'exam_short_answer'].includes(type)) {
     const field = document.querySelector(`[name="q_${id}"]`);
     return field ? field.value.trim() : '';
   }
@@ -152,7 +152,7 @@ gradeQuestion = function gradeQuestion(q) {
     points = Math.max(0, (matches - extras) / Math.max(1, correctAnswers.length));
     ok = points >= 1;
     correct = correctAnswers.join(', ');
-  } else if (q.type === 'matching') {
+  } else if (q.type === 'matching' || q.type === 'matching_headings' || q.type === 'matching_information') {
     const pairs = q.pairs || [];
     const user = Array.isArray(answer) ? answer : [];
     const matches = pairs.filter((pair, index) => normalizeText(user[index]) === normalizeText(pair.answer)).length;
@@ -166,19 +166,19 @@ gradeQuestion = function gradeQuestion(q) {
     points = correctOrder.length ? matches / correctOrder.length : 0;
     ok = points >= 0.75;
     correct = correctOrder.map((itemIndex) => (q.items || [])[itemIndex]).join(' → ');
-  } else if (q.type === 'table_completion') {
+  } else if (q.type === 'table_completion' || q.type === 'flow_chart_completion') {
     const blanks = q.blanks || [];
     const user = Array.isArray(answer) ? answer : [];
     const matches = blanks.filter((blank, index) => (blank.accepted_answers || []).some((accepted) => normalizeText(user[index]).includes(normalizeText(accepted)))).length;
     points = blanks.length ? matches / blanks.length : 0;
     ok = points >= 0.66;
     correct = blanks.map((blank) => `${blank.label}: ${(blank.accepted_answers || []).join('/')}`).join(' | ');
-  } else if (q.type === 'fill_blank' || q.type === 'summary_completion' || q.type === 'reference') {
+  } else if (['fill_blank', 'summary_completion', 'reference', 'reference_question', 'ielts_summary_completion'].includes(q.type)) {
     const accepted = (q.accepted_answers || [q.correct_answer]).filter(Boolean);
     ok = accepted.some((item) => normalizeText(answer) === normalizeText(item) || normalizeText(answer).includes(normalizeText(item)));
     points = ok ? 1 : 0;
     correct = accepted.join(' / ');
-  } else if (['short_answer', 'evidence', 'application', 'keyword_extraction', 'summary_writing', 'paraphrase'].includes(q.type)) {
+  } else if (['short_answer', 'evidence', 'application', 'keyword_extraction', 'summary_writing', 'paraphrase', 'exam_short_answer'].includes(q.type)) {
     const keywords = q.accepted_keywords || [];
     const normalized = normalizeText(answer);
     const hits = keywords.filter((word) => normalized.includes(normalizeText(word))).length;
@@ -222,6 +222,18 @@ questionTypeLabel = function questionTypeLabel(type) {
     keyword_extraction: '关键词提取题',
     summary_writing: '摘要写作题',
     paraphrase: '改写题',
-    table_completion: '表格填空题'
+    table_completion: '表格填空题',
+    tf_not_given: 'IELTS 判断题',
+    yes_no_not_given: '观点判断题',
+    matching_headings: '段落标题匹配',
+    matching_information: '信息匹配题',
+    sentence_insertion: '句子插入题',
+    rhetorical_purpose: '修辞目的题',
+    vocabulary_context: '上下文词义题',
+    reference_question: '指代题',
+    ielts_summary_completion: 'IELTS 摘要填空',
+    flow_chart_completion: '流程图填空',
+    exam_short_answer: '考试简答题',
+    evidence_location: '证据定位题'
   }[type] || '综合题';
 };
