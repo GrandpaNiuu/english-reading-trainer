@@ -1,4 +1,4 @@
-const CACHE_NAME = 'english-reading-trainer-v18-final-runtime';
+const CACHE_NAME = 'english-reading-trainer-v19-button-handler-fix';
 const APP_ASSETS = [
   './',
   './index.html',
