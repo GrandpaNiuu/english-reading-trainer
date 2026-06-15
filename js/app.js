@@ -28,10 +28,63 @@ function boot() {
 }
 
 function normalizePassages(passages) {
-  return passages.map((p) => ({
-    ...p,
-    category: getCategory(p)
-  }));
+  return passages.map((p) => {
+    const category = getCategory(p);
+    const normalized = { ...p, category };
+    return { ...normalized, questions: ensureMixedQuestions(normalized) };
+  });
+}
+
+function ensureMixedQuestions(p) {
+  const base = Array.isArray(p.questions)
+    ? p.questions.map((q) => ({ ...q, type: inferQuestionType(q) }))
+    : [];
+
+  const hasTrueFalse = base.some((q) => q.type === 'true_false');
+  const hasFillBlank = base.some((q) => q.type === 'fill_blank');
+  const hasShortAnswer = base.some((q) => q.type === 'short_answer');
+  const topic = String(p.topic || 'general').trim();
+  const topicAnswer = topic.toLowerCase();
+
+  if (!hasTrueFalse) {
+    base.push({
+      id: `${p.id}_tf_topic`,
+      type: 'true_false',
+      question: `True or False: The passage is mainly connected with ${topic}.`,
+      correct_answer: 'True',
+      explanation_cn: `文章主题字段是 ${topic}，所以该判断为 True。`
+    });
+  }
+
+  if (!hasFillBlank) {
+    base.push({
+      id: `${p.id}_fill_topic`,
+      type: 'fill_blank',
+      question: 'Fill in the blank: The main topic of this passage is ______.',
+      correct_answer: topicAnswer,
+      accepted_answers: [topicAnswer, topic],
+      explanation_cn: `本题填写文章主题：${topic}。`
+    });
+  }
+
+  if (!hasShortAnswer) {
+    base.push({
+      id: `${p.id}_short_lesson`,
+      type: 'short_answer',
+      question: 'Answer briefly: What lesson or main message can readers learn from the passage?',
+      min_words: 5,
+      sample_answer: 'The passage shows that careful thinking and steady action can improve a situation.',
+      explanation_cn: '简答题按完整度自动评分：建议写 5 个英文单词以上，并围绕文章主旨回答。'
+    });
+  }
+
+  return base;
+}
+
+function inferQuestionType(q) {
+  if (['true_false', 'fill_blank', 'short_answer'].includes(q.type)) return q.type;
+  if (q.options) return q.type || 'multiple_choice';
+  return q.type || 'short_answer';
 }
 
 function bind() {
@@ -73,10 +126,10 @@ function categoryLabel(category) {
 
 function categoryDescription(category) {
   return {
-    curated: '优先练习：结构更完整，7 道题，含主旨、推理、词义、结构题。',
-    generated: '大量刷题：10000 篇原创生成题库，适合按难度和主题反复训练。',
-    manual: '快速测试：少量人工样例文章，用于检查功能和基础练习。',
-    custom: '你导入的文章：保存在当前浏览器中。'
+    curated: '优先练习：结构更完整，混合题型，含主旨、推理、词义、判断、填空、简答题。',
+    generated: '大量刷题：10000 篇原创生成题库，自动补充判断、填空、简答题。',
+    manual: '快速测试：人工样例风格短文，支持多题型练习。',
+    custom: '你导入的文章：保存在当前浏览器中，也会自动补充混合题型。'
   }[category] || '';
 }
 
@@ -227,7 +280,7 @@ function createCard(p) {
   footer.className = 'card-footer';
   const meta = document.createElement('span');
   meta.className = 'muted';
-  meta.textContent = `${p.word_count || countWords(p.passage)} words · ${p.questions.length} 题`;
+  meta.textContent = `${p.word_count || countWords(p.passage)} words · ${p.questions.length} 题 · 混合题型`;
   const btn = document.createElement('button');
   btn.className = 'primary-btn';
   btn.textContent = '开始';
@@ -246,13 +299,46 @@ function openPassage(id) {
   $('timerDisplay').textContent = formatTime(0);
   $('practiceLevel').textContent = `${p.level} · ${categoryLabel(p.category)}`;
   $('practiceTitle').textContent = p.title;
-  $('practiceMeta').textContent = `${p.topic || 'general'} · ${p.word_count || countWords(p.passage)} words · ${p.questions.length} 题`;
-  $('passageText').textContent = p.passage;
+  $('practiceMeta').textContent = `${p.topic || 'general'} · ${p.word_count || countWords(p.passage)} words · ${p.questions.length} 题 · 选择/判断/填空/简答`;
+  renderPassageText(p.passage);
   $('questionForm').textContent = '';
   $('preStartBox').classList.remove('hidden');
   $('readingBox').classList.add('hidden');
   show('practiceView');
   window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function renderPassageText(text) {
+  const box = $('passageText');
+  box.textContent = '';
+  const paragraphs = formatPassageParagraphs(text);
+  paragraphs.forEach((paragraph) => {
+    const p = document.createElement('p');
+    p.className = 'passage-paragraph';
+    p.textContent = paragraph;
+    box.appendChild(p);
+  });
+}
+
+function formatPassageParagraphs(text) {
+  const raw = String(text || '').trim();
+  if (!raw) return [''];
+  const existing = raw.split(/\n\s*\n|\r\n\s*\r\n/).map((p) => p.trim()).filter(Boolean);
+  if (existing.length > 1) return existing;
+
+  const sentences = raw.match(/[^.!?]+[.!?]+(?:["”'])?|[^.!?]+$/g) || [raw];
+  const paragraphs = [];
+  let current = [];
+  sentences.map((s) => s.trim()).filter(Boolean).forEach((sentence) => {
+    current.push(sentence);
+    const wordCount = countWords(current.join(' '));
+    if (current.length >= 3 || wordCount >= 70) {
+      paragraphs.push(current.join(' '));
+      current = [];
+    }
+  });
+  if (current.length) paragraphs.push(current.join(' '));
+  return paragraphs;
 }
 
 function randomPassage() {
@@ -276,22 +362,69 @@ function renderQuestions(p) {
   p.questions.forEach((q, index) => {
     const box = document.createElement('section');
     box.className = 'question-card';
+
+    const head = document.createElement('div');
+    head.className = 'question-head';
+    const type = document.createElement('span');
+    type.className = `question-type-pill ${q.type}`;
+    type.textContent = questionTypeLabel(q);
     const title = document.createElement('p');
     title.textContent = `${index + 1}. ${q.question}`;
-    box.appendChild(title);
-    Object.entries(q.options).forEach(([key, value]) => {
-      const label = document.createElement('label');
-      label.className = 'option-label';
+    head.append(type, title);
+    box.appendChild(head);
+
+    if (q.type === 'true_false') {
+      renderTrueFalseInputs(box, q);
+    } else if (q.options) {
+      renderChoiceInputs(box, q);
+    } else if (q.type === 'fill_blank') {
       const input = document.createElement('input');
-      input.type = 'radio';
-      input.name = `q_${q.id}`;
-      input.value = key;
-      const span = document.createElement('span');
-      span.textContent = `${key}. ${value}`;
-      label.append(input, span);
-      box.appendChild(label);
-    });
+      input.type = 'text';
+      input.className = 'text-answer';
+      input.dataset.questionId = String(q.id);
+      input.placeholder = '在这里输入答案，例如 topic / keyword';
+      box.appendChild(input);
+    } else {
+      const textarea = document.createElement('textarea');
+      textarea.className = 'short-answer';
+      textarea.dataset.questionId = String(q.id);
+      textarea.placeholder = '用英文简短回答，建议 5 个单词以上';
+      box.appendChild(textarea);
+    }
+
     form.appendChild(box);
+  });
+}
+
+function renderChoiceInputs(box, q) {
+  Object.entries(q.options).forEach(([key, value]) => {
+    const label = document.createElement('label');
+    label.className = 'option-label';
+    const input = document.createElement('input');
+    input.type = 'radio';
+    input.name = `q_${q.id}`;
+    input.value = key;
+    input.dataset.questionId = String(q.id);
+    const span = document.createElement('span');
+    span.textContent = `${key}. ${value}`;
+    label.append(input, span);
+    box.appendChild(label);
+  });
+}
+
+function renderTrueFalseInputs(box, q) {
+  ['True', 'False'].forEach((value) => {
+    const label = document.createElement('label');
+    label.className = 'option-label';
+    const input = document.createElement('input');
+    input.type = 'radio';
+    input.name = `q_${q.id}`;
+    input.value = value;
+    input.dataset.questionId = String(q.id);
+    const span = document.createElement('span');
+    span.textContent = value;
+    label.append(input, span);
+    box.appendChild(label);
   });
 }
 
@@ -310,22 +443,79 @@ function grade() {
   const p = app.current;
   const details = p.questions.map((q) => {
     const answer = getAnswer(q.id) || '未答';
-    return { question: q.question, user: answer, correct: q.correct_answer, explanation: q.explanation_cn || '', ok: answer === q.correct_answer };
+    return gradeQuestion(q, answer);
   });
-  const correctCount = details.filter((x) => x.ok).length;
+  const totalPoints = details.reduce((sum, item) => sum + item.point, 0);
   const total = details.length;
-  const accuracy = total ? Math.round((correctCount / total) * 100) : 0;
+  const accuracy = total ? Math.round((totalPoints / total) * 100) : 0;
   const seconds = Math.max(1, app.elapsed);
   const words = p.word_count || countWords(p.passage);
   const wpm = Math.round(words / (seconds / 60));
   const timeScore = timeScoreFor(wpm, p.level);
   const score = Math.round(accuracy * 0.82 + timeScore * 0.18);
+  const correctCount = Number(totalPoints.toFixed(1));
   return { title: p.title, level: p.level, correctCount, total, accuracy, seconds, words, wpm, score, details, createdAt: new Date().toISOString() };
 }
 
+function gradeQuestion(q, answer) {
+  const normalizedAnswer = normalizeText(answer);
+  let point = 0;
+  let correctText = '';
+  let explanation = q.explanation_cn || '';
+
+  if (q.type === 'true_false') {
+    correctText = q.correct_answer || 'True';
+    point = normalizeText(answer) === normalizeText(correctText) ? 1 : 0;
+  } else if (q.type === 'fill_blank') {
+    const accepted = (q.accepted_answers && q.accepted_answers.length ? q.accepted_answers : [q.correct_answer]).filter(Boolean);
+    correctText = accepted.join(' / ');
+    point = accepted.some((item) => normalizeText(item) === normalizedAnswer) ? 1 : 0;
+  } else if (q.options) {
+    correctText = q.correct_answer || '';
+    point = answer === correctText ? 1 : 0;
+  } else {
+    correctText = q.sample_answer || q.correct_answer || 'A complete answer related to the passage.';
+    const minWords = q.min_words || 5;
+    const wordCount = countWords(answer);
+    if (wordCount >= minWords) point = 1;
+    else if (wordCount >= Math.max(3, minWords - 2)) point = 0.5;
+    if (!explanation) explanation = `简答题要求至少 ${minWords} 个英文单词，并且内容与文章主旨相关。`;
+  }
+
+  return {
+    type: q.type,
+    typeLabel: questionTypeLabel(q),
+    question: q.question,
+    user: answer,
+    correct: correctText,
+    explanation,
+    point,
+    ok: point >= 1
+  };
+}
+
 function getAnswer(id) {
-  const checked = document.querySelector(`input[name="q_${id}"]:checked`);
-  return checked ? checked.value : '';
+  const questionId = String(id);
+  const checked = document.querySelector(`input[data-question-id="${questionId}"]:checked`);
+  if (checked) return checked.value;
+  const field = document.querySelector(`[data-question-id="${questionId}"]`);
+  return field ? field.value.trim() : '';
+}
+
+function questionTypeLabel(q) {
+  if (q.type === 'true_false') return '判断题';
+  if (q.type === 'fill_blank') return '填空题';
+  if (q.type === 'short_answer') return '简答题';
+  return {
+    main_idea: '主旨选择',
+    detail: '细节选择',
+    inference: '推理选择',
+    vocabulary: '词义选择',
+    structure: '结构选择',
+    theme: '主题选择',
+    lesson: '启示选择',
+    multiple_choice: '选择题'
+  }[q.type] || '选择题';
 }
 
 function timeScoreFor(wpm, level) {
@@ -339,7 +529,7 @@ function renderResult(r) {
   $('resultAdvice').textContent = advice(r.score);
   const stats = $('resultStats');
   stats.textContent = '';
-  [['答对', `${r.correctCount}/${r.total}`], ['正确率', `${r.accuracy}%`], ['总用时', formatTime(r.seconds)], ['阅读速度', `${r.wpm} WPM`], ['字数', `${r.words}`]].forEach(([label, value]) => {
+  [['得分题数', `${r.correctCount}/${r.total}`], ['正确率', `${r.accuracy}%`], ['总用时', formatTime(r.seconds)], ['阅读速度', `${r.wpm} WPM`], ['字数', `${r.words}`]].forEach(([label, value]) => {
     const div = document.createElement('div');
     div.className = 'result-stat';
     const s = document.createElement('span');
@@ -354,13 +544,18 @@ function renderResult(r) {
   r.details.forEach((d, index) => {
     const item = document.createElement('article');
     item.className = `review-item ${d.ok ? 'correct' : 'wrong'}`;
+    const type = document.createElement('span');
+    type.className = `question-type-pill ${d.type}`;
+    type.textContent = d.typeLabel;
     const q = document.createElement('p');
     q.textContent = `${index + 1}. ${d.question}`;
     const a = document.createElement('p');
-    a.textContent = `你的答案：${d.user}　正确答案：${d.correct}`;
+    a.textContent = `你的答案：${d.user || '未答'}`;
+    const c = document.createElement('p');
+    c.textContent = `参考答案：${d.correct || '见解析'}　得分：${d.point}/1`;
     const e = document.createElement('p');
     e.textContent = `解析：${d.explanation || '暂无解析'}`;
-    item.append(q, a, e);
+    item.append(type, q, a, c, e);
     review.appendChild(item);
   });
 }
@@ -529,6 +724,10 @@ function countWords(text) {
 function shortText(text, length) {
   const value = String(text || '');
   return value.length > length ? `${value.slice(0, length)}...` : value;
+}
+
+function normalizeText(value) {
+  return String(value || '').trim().toLowerCase().replace(/\s+/g, ' ');
 }
 
 boot();
