@@ -26,22 +26,10 @@
 
   <main class="container">
     <section class="panel stats-panel" aria-label="学习统计">
-      <div class="stat-card">
-        <span>已练习</span>
-        <strong id="statAttempts">0</strong>
-      </div>
-      <div class="stat-card">
-        <span>平均分</span>
-        <strong id="statAverage">0</strong>
-      </div>
-      <div class="stat-card">
-        <span>最高分</span>
-        <strong id="statBest">0</strong>
-      </div>
-      <div class="stat-card">
-        <span>平均正确率</span>
-        <strong id="statAccuracy">0%</strong>
-      </div>
+      <div class="stat-card"><span>已练习</span><strong id="statAttempts">0</strong></div>
+      <div class="stat-card"><span>平均分</span><strong id="statAverage">0</strong></div>
+      <div class="stat-card"><span>最高分</span><strong id="statBest">0</strong></div>
+      <div class="stat-card"><span>平均正确率</span><strong id="statAccuracy">0%</strong></div>
     </section>
 
     <section id="importPanel" class="panel import-panel hidden" aria-label="导入题库">
@@ -87,13 +75,11 @@
           <p id="passageCount">0 篇文章</p>
         </div>
       </section>
-
       <section id="passageGrid" class="passage-grid" aria-label="文章列表"></section>
     </section>
 
     <section id="practiceView" class="view hidden" aria-label="练习页面">
       <button id="backToHomeBtn" class="ghost-btn">← 返回题库</button>
-
       <article class="panel practice-panel">
         <div class="practice-head">
           <div>
@@ -101,28 +87,16 @@
             <h2 id="practiceTitle"></h2>
             <p id="practiceMeta" class="muted"></p>
           </div>
-          <div class="timer-box">
-            <span>用时</span>
-            <strong id="timerDisplay">00:00</strong>
-          </div>
+          <div class="timer-box"><span>用时</span><strong id="timerDisplay">00:00</strong></div>
         </div>
-
         <div id="preStartBox" class="prestart-box">
           <p>点击开始后显示文章和题目，并自动开始计时。提交答案后自动停止计时并评分。</p>
           <button id="startBtn" class="primary-btn large-btn">开始练习</button>
         </div>
-
         <div id="readingBox" class="hidden">
           <div class="reading-layout">
-            <section>
-              <h3>Passage</h3>
-              <div id="passageText" class="passage-text"></div>
-            </section>
-            <section>
-              <h3>Questions</h3>
-              <form id="questionForm" class="question-form"></form>
-              <button id="submitBtn" class="primary-btn large-btn">提交答案并评分</button>
-            </section>
+            <section><h3>Passage</h3><div id="passageText" class="passage-text"></div></section>
+            <section><h3>Questions</h3><form id="questionForm" class="question-form"></form><button id="submitBtn" class="primary-btn large-btn">提交答案并评分</button></section>
           </div>
         </div>
       </article>
@@ -132,15 +106,8 @@
       <button id="resultBackBtn" class="ghost-btn">← 返回题库</button>
       <section class="panel result-panel">
         <div class="result-main">
-          <div>
-            <p class="eyebrow">Result</p>
-            <h2 id="resultTitle"></h2>
-            <p id="resultAdvice" class="subtitle"></p>
-          </div>
-          <div class="score-circle">
-            <span id="resultScore">0</span>
-            <small>分</small>
-          </div>
+          <div><p class="eyebrow">Result</p><h2 id="resultTitle"></h2><p id="resultAdvice" class="subtitle"></p></div>
+          <div class="score-circle"><span id="resultScore">0</span><small>分</small></div>
         </div>
         <div id="resultStats" class="result-stats"></div>
         <h3>错题与解析</h3>
@@ -158,17 +125,7 @@
       </div>
       <div class="table-wrap">
         <table>
-          <thead>
-            <tr>
-              <th>时间</th>
-              <th>文章</th>
-              <th>难度</th>
-              <th>分数</th>
-              <th>正确率</th>
-              <th>用时</th>
-              <th>速度</th>
-            </tr>
-          </thead>
+          <thead><tr><th>时间</th><th>文章</th><th>难度</th><th>分数</th><th>正确率</th><th>用时</th><th>速度</th></tr></thead>
           <tbody id="historyBody"></tbody>
         </table>
       </div>
@@ -177,6 +134,7 @@
 
   <script src="js/passages.js"></script>
   <script src="js/generated-passages.js"></script>
+  <script src="js/activate-generated-bank.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>
