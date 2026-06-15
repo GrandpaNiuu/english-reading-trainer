@@ -1,0 +1,18 @@
+{
+  "name": "English Reading Trainer",
+  "short_name": "Reading Trainer",
+  "description": "英语阅读理解题库训练网站：大量文章、自动计时、自动批改、自动评分。",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f4f6fb",
+  "theme_color": "#2454d6",
+  "icons": [
+    {
+      "src": "icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
