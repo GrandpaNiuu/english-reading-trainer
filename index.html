@@ -2,19 +2,24 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#2454d6" />
+  <meta name="description" content="英语阅读理解题库训练网站：大量文章、自动计时、自动批改、自动评分、历史记录。" />
   <title>English Reading Trainer</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml" />
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
   <header class="app-header">
     <div>
-      <p class="eyebrow">Local English Reading Trainer</p>
-      <h1>英语阅读理解题库训练器</h1>
-      <p class="subtitle">内置文章题库 · 自动计时 · 自动批改 · 自动评分 · 本地保存历史记录</p>
+      <p class="eyebrow">Web App · PWA Ready</p>
+      <h1>英语阅读理解题库训练网站</h1>
+      <p class="subtitle">内置文章题库 · 自动计时 · 自动批改 · 自动评分 · 手机端 App 化体验</p>
     </div>
     <div class="header-actions">
       <button id="randomBtn" class="secondary-btn">随机一篇</button>
+      <button id="installBtn" class="ghost-btn hidden">安装到桌面</button>
       <button id="importToggleBtn" class="primary-btn">导入题库</button>
     </div>
   </header>
@@ -43,7 +48,7 @@
       <div class="section-title-row">
         <div>
           <h2>导入自定义文章</h2>
-          <p>粘贴单篇文章对象或文章数组，格式见 <code>docs/passage-format.md</code>。数据只保存在当前浏览器。</p>
+          <p>粘贴单篇文章对象或文章数组，格式见 <code>docs/passage-format.md</code>。导入后会保存在当前浏览器。</p>
         </div>
         <button id="closeImportBtn" class="ghost-btn">关闭</button>
       </div>
@@ -147,7 +152,7 @@
       <div class="section-title-row">
         <div>
           <h2>历史记录</h2>
-          <p>记录保存在浏览器 localStorage，不上传到任何服务器。</p>
+          <p>当前版本使用浏览器存储。以后可以升级为登录账号 + 云数据库同步。</p>
         </div>
         <button id="clearHistoryBtn" class="danger-btn">清空历史</button>
       </div>
