@@ -1,0 +1,309 @@
+body {
+  background: #f7f8fc;
+}
+
+.app-header > div:first-child::after {
+  display: none !important;
+  content: none !important;
+}
+
+.app-header {
+  max-width: 1120px;
+  padding: 18px 16px 10px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 14px;
+  align-items: stretch;
+}
+
+.app-header > div:first-child {
+  min-height: auto !important;
+  padding: 24px !important;
+  border-radius: 26px !important;
+  background: linear-gradient(135deg, #ffffff 0%, #f8faff 100%) !important;
+  box-shadow: 0 18px 48px rgba(30, 41, 59, .08) !important;
+}
+
+.app-header h1 {
+  font-size: clamp(30px, 4.6vw, 54px) !important;
+  line-height: 1.04;
+  max-width: 760px;
+}
+
+.app-header .subtitle {
+  font-size: 15px !important;
+  color: #667085 !important;
+}
+
+.header-actions {
+  min-width: 142px !important;
+  gap: 10px !important;
+}
+
+.header-actions button {
+  min-height: 48px;
+  border-radius: 18px !important;
+}
+
+.container {
+  max-width: 1120px;
+  padding: 0 16px 108px;
+}
+
+.quick-start-panel {
+  min-height: 280px;
+  border-radius: 30px !important;
+  padding: 26px !important;
+  margin-bottom: 18px;
+  background: linear-gradient(145deg, #111827 0%, #273c90 48%, #4f6cff 100%) !important;
+}
+
+.quick-hero h2 {
+  font-size: clamp(30px, 4.5vw, 48px) !important;
+}
+
+.quick-hero p {
+  max-width: 760px;
+  color: rgba(255,255,255,.70) !important;
+}
+
+.quick-action-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.quick-action-card {
+  min-height: 128px;
+  border-radius: 24px;
+  padding: 16px;
+}
+
+.stats-panel,
+.library-summary-panel,
+.exam-mode-panel,
+.filter-panel,
+.history-panel,
+.mistake-panel,
+.vocab-panel {
+  border-radius: 28px !important;
+}
+
+.stats-panel {
+  padding: 18px !important;
+  margin-bottom: 18px;
+}
+
+.stat-card {
+  min-height: 94px;
+  border-radius: 20px !important;
+}
+
+.stat-card strong {
+  font-size: 28px !important;
+}
+
+.library-summary-panel {
+  padding: 22px !important;
+}
+
+.library-summary {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.category-card {
+  min-height: 132px !important;
+  border-radius: 24px !important;
+}
+
+.category-card strong {
+  font-size: 24px !important;
+}
+
+.filter-panel {
+  position: static !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  gap: 12px !important;
+  padding: 16px !important;
+}
+
+.library-head-row {
+  margin: 10px 0 12px !important;
+}
+
+.library-head-row h2 {
+  font-size: 24px !important;
+}
+
+#passageCount {
+  font-size: 14px;
+  color: #667085 !important;
+}
+
+.passage-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.passage-card {
+  min-height: 235px !important;
+  border-radius: 24px !important;
+  padding: 16px !important;
+}
+
+.passage-card h3 {
+  font-size: 18px !important;
+}
+
+.passage-card .muted {
+  display: inline-flex;
+  border-radius: 999px;
+  padding: 7px 10px;
+  background: #f2f4f7;
+}
+
+.app-bottom-nav {
+  bottom: 18px !important;
+  width: min(560px, calc(100% - 28px)) !important;
+  border-radius: 26px !important;
+  padding: 8px !important;
+  box-shadow: 0 18px 45px rgba(16,24,40,.22) !important;
+}
+
+.app-bottom-nav button {
+  border-radius: 18px !important;
+}
+
+.modern-app-shell .stats-panel[data-app-section="home"] {
+  display: none !important;
+}
+
+@media (max-width: 760px) {
+  body {
+    background: #f5f7fb;
+  }
+
+  .app-header {
+    display: block;
+    padding: 12px 12px 6px;
+  }
+
+  .app-header > div:first-child {
+    padding: 20px !important;
+    border-radius: 24px !important;
+  }
+
+  .app-header h1 {
+    font-size: 34px !important;
+    letter-spacing: -.05em;
+  }
+
+  .app-header .subtitle {
+    font-size: 14px !important;
+    line-height: 1.55;
+  }
+
+  .eyebrow {
+    font-size: 11px !important;
+  }
+
+  .header-actions {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr;
+    margin-top: 10px;
+    min-width: 0 !important;
+  }
+
+  .header-actions button {
+    min-height: 44px;
+    padding: 10px 12px !important;
+    font-size: 14px;
+  }
+
+  #importToggleBtn {
+    grid-column: 1 / -1;
+  }
+
+  .container {
+    padding: 0 12px 98px;
+  }
+
+  .quick-start-panel {
+    min-height: auto;
+    padding: 20px !important;
+    border-radius: 28px !important;
+  }
+
+  .quick-hero {
+    gap: 14px;
+  }
+
+  .quick-hero h2 {
+    font-size: 32px !important;
+  }
+
+  .quick-action-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 10px;
+  }
+
+  .quick-action-card {
+    min-height: 118px;
+    padding: 14px;
+    border-radius: 22px;
+  }
+
+  .quick-action-card strong {
+    font-size: 18px;
+  }
+
+  .library-summary,
+  .passage-grid,
+  .filter-panel,
+  .exam-mode-grid,
+  .mistake-list,
+  .vocab-list {
+    grid-template-columns: 1fr !important;
+  }
+
+  .category-card {
+    min-height: 104px !important;
+  }
+
+  .category-card small {
+    display: none;
+  }
+
+  .reading-layout {
+    grid-template-columns: 1fr !important;
+  }
+
+  .practice-panel,
+  .result-panel {
+    padding: 16px !important;
+  }
+
+  .app-bottom-nav {
+    width: calc(100% - 18px) !important;
+    bottom: 8px !important;
+    padding: 7px !important;
+    border-radius: 24px !important;
+  }
+
+  .app-bottom-nav button span {
+    font-size: 16px !important;
+  }
+
+  .app-bottom-nav button strong {
+    font-size: 10px !important;
+  }
+}
+
+@media (max-width: 420px) {
+  .quick-action-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .app-header h1 {
+    font-size: 30px !important;
+  }
+}
