@@ -1,0 +1,82 @@
+.vocab-panel {
+  border: 1px solid rgba(8, 116, 67, .16);
+}
+
+.vocab-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.vocab-list {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.vocab-card {
+  background: #fff;
+  border: 1px solid rgba(8, 116, 67, .16);
+  border-radius: 18px;
+  padding: 14px;
+  box-shadow: 0 10px 24px rgba(16, 24, 40, .05);
+  display: grid;
+  gap: 8px;
+}
+
+.vocab-card strong {
+  font-size: 18px;
+  color: #087443;
+}
+
+.vocab-card span {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.vocab-remove-btn {
+  padding: 7px 10px;
+  width: fit-content;
+}
+
+.vocab-word-btn {
+  border: 0;
+  background: transparent;
+  color: inherit;
+  padding: 0 1px;
+  border-radius: 5px;
+  font: inherit;
+  cursor: pointer;
+}
+
+.vocab-word-btn:hover {
+  background: #e9fbf3;
+  color: #087443;
+  box-shadow: inset 0 -2px 0 rgba(8, 116, 67, .28);
+}
+
+.clickable-vocab-paragraph {
+  user-select: text;
+}
+
+@media (max-width: 900px) {
+  .vocab-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 560px) {
+  .vocab-list {
+    grid-template-columns: 1fr;
+  }
+
+  .vocab-actions {
+    width: 100%;
+  }
+
+  .vocab-actions button {
+    flex: 1;
+  }
+}
