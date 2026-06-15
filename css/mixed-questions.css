@@ -1,78 +1,73 @@
 .passage-text {
   white-space: normal;
+  max-height: 72vh;
+  overflow-y: auto;
 }
 
+.reading-paragraph,
 .passage-paragraph {
   margin: 0 0 18px;
-  text-indent: 1.6em;
-  line-height: 1.92;
+  padding-bottom: 18px;
+  border-bottom: 1px solid rgba(217, 222, 234, 0.7);
+  text-indent: 1.5em;
   color: #202a44;
 }
 
+.reading-paragraph:last-child,
 .passage-paragraph:last-child {
+  border-bottom: 0;
   margin-bottom: 0;
+  padding-bottom: 0;
 }
 
-.question-head {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  margin-bottom: 12px;
+.reading-paragraph.first-paragraph::first-letter,
+.passage-paragraph:first-child::first-letter {
+  font-size: 1.7em;
+  font-weight: 800;
+  color: var(--primary);
 }
 
-.question-head p {
-  margin: 0;
-  flex: 1;
+.question-title {
+  margin: 10px 0 12px;
 }
 
 .question-type-pill {
   display: inline-flex;
-  flex-shrink: 0;
-  align-items: center;
-  justify-content: center;
+  width: fit-content;
   border-radius: 999px;
   padding: 5px 9px;
   font-size: 12px;
-  font-weight: 900;
-  background: #eef3ff;
-  color: #2454d6;
+  font-weight: 850;
+  background: #f1f4fb;
+  color: #394150;
 }
 
-.question-type-pill.true_false {
-  background: #fff6e8;
-  color: #b65c00;
-}
-
-.question-type-pill.fill_blank {
-  background: #f2ecff;
-  color: #6638b6;
-}
-
-.question-type-pill.short_answer {
+.question-card.true_false .question-type-pill {
   background: #ecfdf3;
   color: #087443;
 }
 
-.text-answer,
-.short-answer {
-  width: 100%;
-  margin-top: 8px;
-  border: 1px solid var(--line);
-  border-radius: 13px;
-  padding: 12px 13px;
-  background: #fff;
-  color: var(--text);
-  outline: none;
+.question-card.fill_blank .question-type-pill {
+  background: #fff6e8;
+  color: #b65c00;
 }
 
-.short-answer {
+.question-card.short_answer .question-type-pill {
+  background: #f2ecff;
+  color: #6638b6;
+}
+
+.text-answer-input,
+.short-answer-input {
+  margin-top: 8px;
+}
+
+.short-answer-input {
   min-height: 110px;
-  resize: vertical;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   line-height: 1.6;
 }
 
-.text-answer:focus,
-.short-answer:focus {
-  border-color: var(--primary);
-  box-shadow: 0 0 0 4px rgba(36,84,214,.1);
+.review-item p:first-child {
+  font-weight: 800;
 }
