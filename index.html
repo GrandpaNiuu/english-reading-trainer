@@ -6,16 +6,16 @@
   <meta name="theme-color" content="#2454d6" />
   <meta name="description" content="英语阅读理解题库训练网站：大量文章、自动计时、自动批改、自动评分、历史记录。" />
   <title>English Reading Trainer</title>
-  <link rel="manifest" href="manifest.json?v=10500-20260616" />
-  <link rel="icon" href="icons/icon.svg?v=10500-20260616" type="image/svg+xml" />
-  <link rel="stylesheet" href="css/style.css?v=10500-20260616" />
+  <link rel="manifest" href="manifest.json?v=library-ui-20260616" />
+  <link rel="icon" href="icons/icon.svg?v=library-ui-20260616" type="image/svg+xml" />
+  <link rel="stylesheet" href="css/style.css?v=library-ui-20260616" />
 </head>
 <body>
   <header class="app-header">
     <div>
       <p class="eyebrow">Web App · PWA Ready</p>
       <h1>英语阅读理解题库训练网站</h1>
-      <p class="subtitle">内置文章题库 · 自动计时 · 自动批改 · 自动评分 · 手机端 App 化体验</p>
+      <p class="subtitle">内置文章题库 · 自动计时 · 自动批改 · 自动评分 · 分类题库训练</p>
     </div>
     <div class="header-actions">
       <button id="randomBtn" class="secondary-btn">随机一篇</button>
@@ -30,6 +30,16 @@
       <div class="stat-card"><span>平均分</span><strong id="statAverage">0</strong></div>
       <div class="stat-card"><span>最高分</span><strong id="statBest">0</strong></div>
       <div class="stat-card"><span>平均正确率</span><strong id="statAccuracy">0%</strong></div>
+    </section>
+
+    <section class="panel library-summary-panel" aria-label="题库分类">
+      <div class="section-title-row">
+        <div>
+          <h2>题库分类</h2>
+          <p>优先推荐“精选强化”，基础大题库用于大量刷题，人工样例用于快速测试。</p>
+        </div>
+      </div>
+      <div id="librarySummary" class="library-summary"></div>
     </section>
 
     <section id="importPanel" class="panel import-panel hidden" aria-label="导入题库">
@@ -51,6 +61,16 @@
     <section id="homeView" class="view active-view">
       <section class="panel filter-panel">
         <div>
+          <label for="categoryFilter">题库类型</label>
+          <select id="categoryFilter">
+            <option value="all">全部题库</option>
+            <option value="curated">精选强化</option>
+            <option value="generated">基础大题库</option>
+            <option value="manual">人工样例</option>
+            <option value="custom">自定义导入</option>
+          </select>
+        </div>
+        <div>
           <label for="levelFilter">难度</label>
           <select id="levelFilter">
             <option value="all">全部难度</option>
@@ -63,14 +83,24 @@
             <option value="TOEFL">TOEFL</option>
           </select>
         </div>
+        <div>
+          <label for="topicFilter">主题</label>
+          <select id="topicFilter">
+            <option value="all">全部主题</option>
+          </select>
+        </div>
         <div class="search-box">
-          <label for="searchInput">搜索标题 / 主题</label>
-          <input id="searchInput" type="search" placeholder="例如 curated, business, technology, travel" />
+          <label for="searchInput">搜索</label>
+          <input id="searchInput" type="search" placeholder="例如 business, technology, curated" />
         </div>
       </section>
 
-      <section class="section-title-row">
-        <div><h2>文章题库</h2><p id="passageCount">0 篇文章</p></div>
+      <section class="section-title-row library-head-row">
+        <div>
+          <h2>文章题库</h2>
+          <p id="passageCount">0 篇文章</p>
+        </div>
+        <button id="resetFiltersBtn" class="ghost-btn">重置筛选</button>
       </section>
       <section id="passageGrid" class="passage-grid" aria-label="文章列表"></section>
     </section>
@@ -122,10 +152,10 @@
     </section>
   </main>
 
-  <script src="js/passages.js?v=10500-20260616"></script>
-  <script src="js/generated-passages.js?v=10500-20260616"></script>
-  <script src="js/curated-passages.js?v=10500-20260616"></script>
-  <script src="js/activate-generated-bank.js?v=10500-20260616"></script>
-  <script src="js/app.js?v=10500-20260616"></script>
+  <script src="js/passages.js?v=library-ui-20260616"></script>
+  <script src="js/generated-passages.js?v=library-ui-20260616"></script>
+  <script src="js/curated-passages.js?v=library-ui-20260616"></script>
+  <script src="js/activate-generated-bank.js?v=library-ui-20260616"></script>
+  <script src="js/app.js?v=library-ui-20260616"></script>
 </body>
 </html>
