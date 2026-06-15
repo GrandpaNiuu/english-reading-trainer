@@ -1,15 +1,15 @@
-const CACHE_NAME = 'english-reading-trainer-v4-10500';
+const CACHE_NAME = 'english-reading-trainer-v5-10500';
 const APP_ASSETS = [
   './',
   './index.html',
-  './css/style.css',
-  './js/passages.js',
-  './js/generated-passages.js',
-  './js/curated-passages.js',
-  './js/activate-generated-bank.js',
-  './js/app.js',
-  './manifest.json',
-  './icons/icon.svg'
+  './css/style.css?v=10500-20260616',
+  './js/passages.js?v=10500-20260616',
+  './js/generated-passages.js?v=10500-20260616',
+  './js/curated-passages.js?v=10500-20260616',
+  './js/activate-generated-bank.js?v=10500-20260616',
+  './js/app.js?v=10500-20260616',
+  './manifest.json?v=10500-20260616',
+  './icons/icon.svg?v=10500-20260616'
 ];
 
 self.addEventListener('install', (event) => {
