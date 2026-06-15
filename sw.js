@@ -1,16 +1,17 @@
-const CACHE_NAME = 'english-reading-trainer-v7-manual-200';
+const CACHE_NAME = 'english-reading-trainer-v8-mixed-questions';
 const APP_ASSETS = [
   './',
   './index.html',
-  './css/style.css?v=manual-200-20260616',
-  './js/passages.js?v=manual-200-20260616',
-  './js/manual-passages.js?v=manual-200-20260616',
-  './js/generated-passages.js?v=manual-200-20260616',
-  './js/curated-passages.js?v=manual-200-20260616',
-  './js/activate-generated-bank.js?v=manual-200-20260616',
-  './js/app.js?v=manual-200-20260616',
-  './manifest.json?v=manual-200-20260616',
-  './icons/icon.svg?v=manual-200-20260616'
+  './css/style.css?v=mixed-questions-20260616',
+  './css/mixed-questions.css?v=mixed-questions-20260616',
+  './js/passages.js?v=mixed-questions-20260616',
+  './js/manual-passages.js?v=mixed-questions-20260616',
+  './js/generated-passages.js?v=mixed-questions-20260616',
+  './js/curated-passages.js?v=mixed-questions-20260616',
+  './js/activate-generated-bank.js?v=mixed-questions-20260616',
+  './js/app.js?v=mixed-questions-20260616',
+  './manifest.json?v=mixed-questions-20260616',
+  './icons/icon.svg?v=mixed-questions-20260616'
 ];
 
 self.addEventListener('install', (event) => {
