@@ -1,9 +1,11 @@
-const CACHE_NAME = 'english-reading-trainer-v1';
+const CACHE_NAME = 'english-reading-trainer-v2';
 const APP_ASSETS = [
   './',
   './index.html',
   './css/style.css',
   './js/passages.js',
+  './js/generated-passages.js',
+  './js/activate-generated-bank.js',
   './js/app.js',
   './manifest.json',
   './icons/icon.svg'
