@@ -1,22 +1,24 @@
-const CACHE_NAME = 'english-reading-trainer-v10-non-choice';
+const CACHE_NAME = 'english-reading-trainer-v11-exam-ui';
 const APP_ASSETS = [
   './',
   './index.html',
-  './css/style.css?v=non-choice-20260616',
-  './css/mixed-questions.css?v=non-choice-20260616',
-  './css/non-choice.css?v=non-choice-20260616',
-  './js/passages.js?v=non-choice-20260616',
-  './js/manual-passages.js?v=non-choice-20260616',
-  './js/generated-passages.js?v=non-choice-20260616',
-  './js/curated-passages.js?v=non-choice-20260616',
-  './js/activate-generated-bank.js?v=non-choice-20260616',
-  './js/advanced-question-types.js?v=non-choice-20260616',
-  './js/non-choice-question-types.js?v=non-choice-20260616',
-  './js/app.js?v=non-choice-20260616',
-  './js/question-type-labels.js?v=non-choice-20260616',
-  './js/non-choice-runtime.js?v=non-choice-20260616',
-  './manifest.json?v=non-choice-20260616',
-  './icons/icon.svg?v=non-choice-20260616'
+  './css/style.css?v=exam-ui-20260616',
+  './css/mixed-questions.css?v=exam-ui-20260616',
+  './css/non-choice.css?v=exam-ui-20260616',
+  './css/polished-ui.css?v=exam-ui-20260616',
+  './js/passages.js?v=exam-ui-20260616',
+  './js/manual-passages.js?v=exam-ui-20260616',
+  './js/generated-passages.js?v=exam-ui-20260616',
+  './js/curated-passages.js?v=exam-ui-20260616',
+  './js/activate-generated-bank.js?v=exam-ui-20260616',
+  './js/advanced-question-types.js?v=exam-ui-20260616',
+  './js/exam-question-types.js?v=exam-ui-20260616',
+  './js/non-choice-question-types.js?v=exam-ui-20260616',
+  './js/app.js?v=exam-ui-20260616',
+  './js/question-type-labels.js?v=exam-ui-20260616',
+  './js/non-choice-runtime.js?v=exam-ui-20260616',
+  './manifest.json?v=exam-ui-20260616',
+  './icons/icon.svg?v=exam-ui-20260616'
 ];
 
 self.addEventListener('install', (event) => {
