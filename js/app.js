@@ -9,7 +9,9 @@ const app = {
   timer: null,
   startedAt: 0,
   elapsed: 0,
-  installPrompt: null
+  installPrompt: null,
+  visibleLimit: 60,
+  filtered: []
 };
 
 const $ = (id) => document.getElementById(id);
@@ -17,14 +19,14 @@ const $ = (id) => document.getElementById(id);
 function boot() {
   app.passages = [...(window.PASSAGES || []), ...readJson(STORE.custom, [])];
   bind();
-  renderCards();
+  renderCards(true);
   renderHistory();
   initPwa();
 }
 
 function bind() {
-  $('levelFilter').addEventListener('change', renderCards);
-  $('searchInput').addEventListener('input', renderCards);
+  $('levelFilter').addEventListener('change', () => renderCards(true));
+  $('searchInput').addEventListener('input', () => renderCards(true));
   $('randomBtn').addEventListener('click', randomPassage);
   $('backToHomeBtn').addEventListener('click', home);
   $('resultBackBtn').addEventListener('click', home);
@@ -38,19 +40,23 @@ function bind() {
   $('installBtn').addEventListener('click', installSiteApp);
 }
 
-function renderCards() {
+function renderCards(resetLimit = false) {
+  if (resetLimit) app.visibleLimit = 60;
   const level = $('levelFilter').value;
   const query = $('searchInput').value.trim().toLowerCase();
   const grid = $('passageGrid');
   grid.textContent = '';
-  const list = app.passages.filter((p) => {
+
+  app.filtered = app.passages.filter((p) => {
     const okLevel = level === 'all' || p.level === level;
-    const text = `${p.title} ${p.topic || ''} ${p.level}`.toLowerCase();
+    const text = `${p.title} ${p.topic || ''} ${p.level} ${p.source || ''}`.toLowerCase();
     return okLevel && (!query || text.includes(query));
   });
-  $('passageCount').textContent = `${list.length} 篇文章`;
 
-  if (!list.length) {
+  const shown = app.filtered.slice(0, app.visibleLimit);
+  $('passageCount').textContent = `${app.filtered.length} 篇文章，当前显示 ${shown.length} 篇`;
+
+  if (!shown.length) {
     const empty = document.createElement('p');
     empty.className = 'muted';
     empty.textContent = '没有找到符合条件的文章。';
@@ -58,36 +64,44 @@ function renderCards() {
     return;
   }
 
-  list.forEach((p) => {
-    const card = document.createElement('article');
-    card.className = 'passage-card';
+  const fragment = document.createDocumentFragment();
+  shown.forEach((p) => fragment.appendChild(createCard(p)));
+  grid.appendChild(fragment);
 
-    const levelPill = document.createElement('span');
-    levelPill.className = 'level-pill';
-    levelPill.textContent = p.level;
+  if (shown.length < app.filtered.length) {
+    const more = document.createElement('button');
+    more.className = 'secondary-btn load-more-btn';
+    more.textContent = `显示更多 60 篇（剩余 ${app.filtered.length - shown.length} 篇）`;
+    more.addEventListener('click', () => {
+      app.visibleLimit += 60;
+      renderCards(false);
+    });
+    grid.appendChild(more);
+  }
+}
 
-    const title = document.createElement('h3');
-    title.textContent = p.title;
-
-    const preview = document.createElement('p');
-    preview.textContent = shortText(p.passage, 135);
-
-    const footer = document.createElement('div');
-    footer.className = 'card-footer';
-
-    const meta = document.createElement('span');
-    meta.className = 'muted';
-    meta.textContent = `${p.word_count || countWords(p.passage)} words · ${p.questions.length} 题`;
-
-    const btn = document.createElement('button');
-    btn.className = 'primary-btn';
-    btn.textContent = '开始';
-    btn.addEventListener('click', () => openPassage(p.id));
-
-    footer.append(meta, btn);
-    card.append(levelPill, title, preview, footer);
-    grid.appendChild(card);
-  });
+function createCard(p) {
+  const card = document.createElement('article');
+  card.className = 'passage-card';
+  const level = document.createElement('span');
+  level.className = 'level-pill';
+  level.textContent = p.level;
+  const title = document.createElement('h3');
+  title.textContent = p.title;
+  const preview = document.createElement('p');
+  preview.textContent = shortText(p.passage, 135);
+  const footer = document.createElement('div');
+  footer.className = 'card-footer';
+  const meta = document.createElement('span');
+  meta.className = 'muted';
+  meta.textContent = `${p.word_count || countWords(p.passage)} words · ${p.questions.length} 题`;
+  const btn = document.createElement('button');
+  btn.className = 'primary-btn';
+  btn.textContent = '开始';
+  btn.addEventListener('click', () => openPassage(p.id));
+  footer.append(meta, btn);
+  card.append(level, title, preview, footer);
+  return card;
 }
 
 function openPassage(id) {
@@ -109,8 +123,9 @@ function openPassage(id) {
 }
 
 function randomPassage() {
-  if (!app.passages.length) return;
-  const p = app.passages[Math.floor(Math.random() * app.passages.length)];
+  const pool = app.filtered.length ? app.filtered : app.passages;
+  if (!pool.length) return;
+  const p = pool[Math.floor(Math.random() * pool.length)];
   openPassage(p.id);
 }
 
@@ -131,7 +146,6 @@ function renderQuestions(p) {
     const title = document.createElement('p');
     title.textContent = `${index + 1}. ${q.question}`;
     box.appendChild(title);
-
     Object.entries(q.options).forEach(([key, value]) => {
       const label = document.createElement('label');
       label.className = 'option-label';
@@ -192,13 +206,7 @@ function renderResult(r) {
   $('resultAdvice').textContent = advice(r.score);
   const stats = $('resultStats');
   stats.textContent = '';
-  [
-    ['答对', `${r.correctCount}/${r.total}`],
-    ['正确率', `${r.accuracy}%`],
-    ['总用时', formatTime(r.seconds)],
-    ['阅读速度', `${r.wpm} WPM`],
-    ['字数', `${r.words}`]
-  ].forEach(([label, value]) => {
+  [['答对', `${r.correctCount}/${r.total}`], ['正确率', `${r.accuracy}%`], ['总用时', formatTime(r.seconds)], ['阅读速度', `${r.wpm} WPM`], ['字数', `${r.words}`]].forEach(([label, value]) => {
     const div = document.createElement('div');
     div.className = 'result-stat';
     const s = document.createElement('span');
@@ -208,7 +216,6 @@ function renderResult(r) {
     div.append(s, b);
     stats.appendChild(div);
   });
-
   const review = $('reviewList');
   review.textContent = '';
   r.details.forEach((d, index) => {
@@ -247,9 +254,7 @@ function stopTimer() {
 }
 
 function show(id) {
-  ['homeView', 'practiceView', 'resultView'].forEach((viewId) => {
-    $(viewId).classList.toggle('hidden', viewId !== id);
-  });
+  ['homeView', 'practiceView', 'resultView'].forEach((viewId) => $(viewId).classList.toggle('hidden', viewId !== id));
 }
 
 function home() {
@@ -315,7 +320,7 @@ function importPassages() {
   app.passages = [...(window.PASSAGES || []), ...readJson(STORE.custom, [])];
   $('importText').value = '';
   setImportMessage(`导入成功：${parsed.length} 篇。`, false);
-  renderCards();
+  renderCards(true);
 }
 
 function parseImport(raw) {
@@ -336,7 +341,7 @@ function clearCustom() {
   localStorage.removeItem(STORE.custom);
   app.passages = [...(window.PASSAGES || [])];
   setImportMessage('自定义题库已清空。', false);
-  renderCards();
+  renderCards(true);
 }
 
 function setImportMessage(text, isError) {
