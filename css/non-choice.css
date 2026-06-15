@@ -1,0 +1,53 @@
+.checkbox-label input {
+  margin-top: 5px;
+}
+
+.question-hint {
+  color: var(--muted);
+  font-size: 13px;
+  margin: 8px 0 0;
+}
+
+.matching-grid,
+.ordering-list,
+.completion-table {
+  display: grid;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.matching-row,
+.ordering-row,
+.completion-row {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 10px;
+  align-items: center;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #fbfcff;
+}
+
+.matching-row span,
+.ordering-row span,
+.completion-row label {
+  font-weight: 750;
+  margin: 0;
+}
+
+.question-card.multi_select .question-type-pill { background: #e8f0ff; color: #2454d6; }
+.question-card.matching .question-type-pill { background: #e9fbf5; color: #087443; }
+.question-card.ordering .question-type-pill { background: #fff3dc; color: #b65c00; }
+.question-card.keyword_extraction .question-type-pill,
+.question-card.summary_writing .question-type-pill,
+.question-card.paraphrase .question-type-pill,
+.question-card.table_completion .question-type-pill { background: #f2ecff; color: #6638b6; }
+
+@media (max-width: 700px) {
+  .matching-row,
+  .ordering-row,
+  .completion-row {
+    grid-template-columns: 1fr;
+  }
+}
