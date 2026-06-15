@@ -1,0 +1,106 @@
+.exam-mode-panel {
+  border: 1px solid rgba(49, 87, 246, .18);
+}
+
+.exam-mode-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-top: 14px;
+}
+
+.practice-mode-note {
+  background: #f6f8ff;
+  border: 1px solid rgba(49, 87, 246, .18);
+  border-radius: 16px;
+  padding: 12px 14px;
+  color: #344054;
+  line-height: 1.65;
+}
+
+.mistake-panel {
+  border: 1px solid rgba(192, 54, 44, .16);
+}
+
+.mistake-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.mistake-type-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 12px 0 16px;
+}
+
+.mistake-stat-pill {
+  border-radius: 999px;
+  padding: 7px 11px;
+  background: #fff2f1;
+  color: #a33128;
+  font-weight: 800;
+  font-size: 12px;
+}
+
+.mistake-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.mistake-card {
+  background: #fff;
+  border: 1px solid rgba(192, 54, 44, .14);
+  border-radius: 20px;
+  padding: 16px;
+  box-shadow: 0 14px 28px rgba(16, 24, 40, .06);
+}
+
+.mistake-card-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+  align-items: center;
+}
+
+.mistake-card-head span {
+  border-radius: 999px;
+  background: #fff2f1;
+  color: #a33128;
+  padding: 6px 9px;
+  font-size: 12px;
+  font-weight: 850;
+}
+
+.mistake-card-head small {
+  color: var(--muted);
+}
+
+.mistake-card h3 {
+  font-size: 16px;
+  line-height: 1.45;
+}
+
+.mistake-card p {
+  color: #475467;
+  line-height: 1.55;
+  margin-bottom: 8px;
+}
+
+@media (max-width: 900px) {
+  .exam-mode-grid,
+  .mistake-list {
+    grid-template-columns: 1fr;
+  }
+
+  .mistake-actions {
+    width: 100%;
+  }
+
+  .mistake-actions button {
+    flex: 1;
+  }
+}
