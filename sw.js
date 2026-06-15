@@ -1,19 +1,22 @@
-const CACHE_NAME = 'english-reading-trainer-v9-advanced-types';
+const CACHE_NAME = 'english-reading-trainer-v10-non-choice';
 const APP_ASSETS = [
   './',
   './index.html',
-  './css/style.css?v=advanced-types-20260616',
-  './css/mixed-questions.css?v=advanced-types-20260616',
-  './js/passages.js?v=advanced-types-20260616',
-  './js/manual-passages.js?v=advanced-types-20260616',
-  './js/generated-passages.js?v=advanced-types-20260616',
-  './js/curated-passages.js?v=advanced-types-20260616',
-  './js/activate-generated-bank.js?v=advanced-types-20260616',
-  './js/advanced-question-types.js?v=advanced-types-20260616',
-  './js/app.js?v=advanced-types-20260616',
-  './js/question-type-labels.js?v=advanced-types-20260616',
-  './manifest.json?v=advanced-types-20260616',
-  './icons/icon.svg?v=advanced-types-20260616'
+  './css/style.css?v=non-choice-20260616',
+  './css/mixed-questions.css?v=non-choice-20260616',
+  './css/non-choice.css?v=non-choice-20260616',
+  './js/passages.js?v=non-choice-20260616',
+  './js/manual-passages.js?v=non-choice-20260616',
+  './js/generated-passages.js?v=non-choice-20260616',
+  './js/curated-passages.js?v=non-choice-20260616',
+  './js/activate-generated-bank.js?v=non-choice-20260616',
+  './js/advanced-question-types.js?v=non-choice-20260616',
+  './js/non-choice-question-types.js?v=non-choice-20260616',
+  './js/app.js?v=non-choice-20260616',
+  './js/question-type-labels.js?v=non-choice-20260616',
+  './js/non-choice-runtime.js?v=non-choice-20260616',
+  './manifest.json?v=non-choice-20260616',
+  './icons/icon.svg?v=non-choice-20260616'
 ];
 
 self.addEventListener('install', (event) => {
