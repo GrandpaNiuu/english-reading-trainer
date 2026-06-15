@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>English Reading Trainer</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <header class="app-header">
+    <div>
+      <p class="eyebrow">Local English Reading Trainer</p>
+      <h1>英语阅读理解题库训练器</h1>
+      <p class="subtitle">内置文章题库 · 自动计时 · 自动批改 · 自动评分 · 本地保存历史记录</p>
+    </div>
+    <div class="header-actions">
+      <button id="randomBtn" class="secondary-btn">随机一篇</button>
+      <button id="importToggleBtn" class="primary-btn">导入题库</button>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="panel stats-panel" aria-label="学习统计">
+      <div class="stat-card">
+        <span>已练习</span>
+        <strong id="statAttempts">0</strong>
+      </div>
+      <div class="stat-card">
+        <span>平均分</span>
+        <strong id="statAverage">0</strong>
+      </div>
+      <div class="stat-card">
+        <span>最高分</span>
+        <strong id="statBest">0</strong>
+      </div>
+      <div class="stat-card">
+        <span>平均正确率</span>
+        <strong id="statAccuracy">0%</strong>
+      </div>
+    </section>
+
+    <section id="importPanel" class="panel import-panel hidden" aria-label="导入题库">
+      <div class="section-title-row">
+        <div>
+          <h2>导入自定义文章</h2>
+          <p>粘贴单篇文章对象或文章数组，格式见 <code>docs/passage-format.md</code>。数据只保存在当前浏览器。</p>
+        </div>
+        <button id="closeImportBtn" class="ghost-btn">关闭</button>
+      </div>
+      <textarea id="importText" spellcheck="false" placeholder='[{"id":"b1_custom_001","title":"...","level":"B1","word_count":320,"passage":"...","questions":[...]}]'></textarea>
+      <div class="import-actions">
+        <button id="importBtn" class="primary-btn">确认导入</button>
+        <button id="clearCustomBtn" class="danger-btn">清空自定义题库</button>
+      </div>
+      <p id="importMessage" class="message"></p>
+    </section>
+
+    <section id="homeView" class="view active-view">
+      <section class="panel filter-panel">
+        <div>
+          <label for="levelFilter">难度</label>
+          <select id="levelFilter">
+            <option value="all">全部难度</option>
+            <option value="A1">A1 初级</option>
+            <option value="A2">A2 基础</option>
+            <option value="B1">B1 中级</option>
+            <option value="B2">B2 中高级</option>
+            <option value="C1">C1 高级</option>
+            <option value="IELTS">IELTS</option>
+            <option value="TOEFL">TOEFL</option>
+          </select>
+        </div>
+        <div class="search-box">
+          <label for="searchInput">搜索标题 / 主题</label>
+          <input id="searchInput" type="search" placeholder="例如 business, technology, travel" />
+        </div>
+      </section>
+
+      <section class="section-title-row">
+        <div>
+          <h2>文章题库</h2>
+          <p id="passageCount">0 篇文章</p>
+        </div>
+      </section>
+
+      <section id="passageGrid" class="passage-grid" aria-label="文章列表"></section>
+    </section>
+
+    <section id="practiceView" class="view hidden" aria-label="练习页面">
+      <button id="backToHomeBtn" class="ghost-btn">← 返回题库</button>
+
+      <article class="panel practice-panel">
+        <div class="practice-head">
+          <div>
+            <p id="practiceLevel" class="level-pill"></p>
+            <h2 id="practiceTitle"></h2>
+            <p id="practiceMeta" class="muted"></p>
+          </div>
+          <div class="timer-box">
+            <span>用时</span>
+            <strong id="timerDisplay">00:00</strong>
+          </div>
+        </div>
+
+        <div id="preStartBox" class="prestart-box">
+          <p>点击开始后显示文章和题目，并自动开始计时。提交答案后自动停止计时并评分。</p>
+          <button id="startBtn" class="primary-btn large-btn">开始练习</button>
+        </div>
+
+        <div id="readingBox" class="hidden">
+          <div class="reading-layout">
+            <section>
+              <h3>Passage</h3>
+              <div id="passageText" class="passage-text"></div>
+            </section>
+            <section>
+              <h3>Questions</h3>
+              <form id="questionForm" class="question-form"></form>
+              <button id="submitBtn" class="primary-btn large-btn">提交答案并评分</button>
+            </section>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <section id="resultView" class="view hidden" aria-label="结果页面">
+      <button id="resultBackBtn" class="ghost-btn">← 返回题库</button>
+      <section class="panel result-panel">
+        <div class="result-main">
+          <div>
+            <p class="eyebrow">Result</p>
+            <h2 id="resultTitle"></h2>
+            <p id="resultAdvice" class="subtitle"></p>
+          </div>
+          <div class="score-circle">
+            <span id="resultScore">0</span>
+            <small>分</small>
+          </div>
+        </div>
+        <div id="resultStats" class="result-stats"></div>
+        <h3>错题与解析</h3>
+        <div id="reviewList" class="review-list"></div>
+      </section>
+    </section>
+
+    <section class="panel history-panel">
+      <div class="section-title-row">
+        <div>
+          <h2>历史记录</h2>
+          <p>记录保存在浏览器 localStorage，不上传到任何服务器。</p>
+        </div>
+        <button id="clearHistoryBtn" class="danger-btn">清空历史</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>时间</th>
+              <th>文章</th>
+              <th>难度</th>
+              <th>分数</th>
+              <th>正确率</th>
+              <th>用时</th>
+              <th>速度</th>
+            </tr>
+          </thead>
+          <tbody id="historyBody"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script src="js/passages.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
