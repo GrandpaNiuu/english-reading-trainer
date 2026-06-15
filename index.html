@@ -6,18 +6,19 @@
   <meta name="theme-color" content="#2454d6" />
   <meta name="description" content="英语阅读理解题库训练网站：大量文章、自动计时、自动批改、自动评分、历史记录。" />
   <title>English Reading Trainer</title>
-  <link rel="manifest" href="manifest.json?v=non-choice-20260616" />
-  <link rel="icon" href="icons/icon.svg?v=non-choice-20260616" type="image/svg+xml" />
-  <link rel="stylesheet" href="css/style.css?v=non-choice-20260616" />
-  <link rel="stylesheet" href="css/mixed-questions.css?v=non-choice-20260616" />
-  <link rel="stylesheet" href="css/non-choice.css?v=non-choice-20260616" />
+  <link rel="manifest" href="manifest.json?v=exam-ui-20260616" />
+  <link rel="icon" href="icons/icon.svg?v=exam-ui-20260616" type="image/svg+xml" />
+  <link rel="stylesheet" href="css/style.css?v=exam-ui-20260616" />
+  <link rel="stylesheet" href="css/mixed-questions.css?v=exam-ui-20260616" />
+  <link rel="stylesheet" href="css/non-choice.css?v=exam-ui-20260616" />
+  <link rel="stylesheet" href="css/polished-ui.css?v=exam-ui-20260616" />
 </head>
 <body>
   <header class="app-header">
     <div>
-      <p class="eyebrow">Web App · PWA Ready</p>
-      <h1>英语阅读理解题库训练网站</h1>
-      <p class="subtitle">内置文章题库 · 自动计时 · 自动批改 · 自动评分 · 分类题库训练</p>
+      <p class="eyebrow">Exam Reading Trainer · IELTS / TOEFL / CET Style</p>
+      <h1>英语阅读理解考试训练系统</h1>
+      <p class="subtitle">10700+ 文章题库 · 考试型题型 · 自动计时 · 自动评分 · 分类训练</p>
     </div>
     <div class="header-actions">
       <button id="randomBtn" class="secondary-btn">随机一篇</button>
@@ -38,7 +39,7 @@
       <div class="section-title-row">
         <div>
           <h2>题库分类</h2>
-          <p>优先推荐“精选强化”，基础大题库用于大量刷题，人工样例用于快速测试。</p>
+          <p>优先练“精选强化”，基础大题库用于大量刷题，人工样例用于快速测试。</p>
         </div>
       </div>
       <div id="librarySummary" class="library-summary"></div>
@@ -93,7 +94,7 @@
         </div>
         <div class="search-box">
           <label for="searchInput">搜索</label>
-          <input id="searchInput" type="search" placeholder="例如 business, technology, curated" />
+          <input id="searchInput" type="search" placeholder="例如 IELTS, TOEFL, business, technology" />
         </div>
       </section>
 
@@ -154,15 +155,16 @@
     </section>
   </main>
 
-  <script src="js/passages.js?v=non-choice-20260616"></script>
-  <script src="js/manual-passages.js?v=non-choice-20260616"></script>
-  <script src="js/generated-passages.js?v=non-choice-20260616"></script>
-  <script src="js/curated-passages.js?v=non-choice-20260616"></script>
-  <script src="js/activate-generated-bank.js?v=non-choice-20260616"></script>
-  <script src="js/advanced-question-types.js?v=non-choice-20260616"></script>
-  <script src="js/non-choice-question-types.js?v=non-choice-20260616"></script>
-  <script src="js/app.js?v=non-choice-20260616"></script>
-  <script src="js/question-type-labels.js?v=non-choice-20260616"></script>
-  <script src="js/non-choice-runtime.js?v=non-choice-20260616"></script>
+  <script src="js/passages.js?v=exam-ui-20260616"></script>
+  <script src="js/manual-passages.js?v=exam-ui-20260616"></script>
+  <script src="js/generated-passages.js?v=exam-ui-20260616"></script>
+  <script src="js/curated-passages.js?v=exam-ui-20260616"></script>
+  <script src="js/activate-generated-bank.js?v=exam-ui-20260616"></script>
+  <script src="js/advanced-question-types.js?v=exam-ui-20260616"></script>
+  <script src="js/exam-question-types.js?v=exam-ui-20260616"></script>
+  <script src="js/non-choice-question-types.js?v=exam-ui-20260616"></script>
+  <script src="js/app.js?v=exam-ui-20260616"></script>
+  <script src="js/question-type-labels.js?v=exam-ui-20260616"></script>
+  <script src="js/non-choice-runtime.js?v=exam-ui-20260616"></script>
 </body>
 </html>
