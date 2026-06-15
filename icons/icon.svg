@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="English Reading Trainer icon">
+  <rect width="512" height="512" rx="112" fill="#2454d6"/>
+  <path d="M140 132h172c37 0 68 31 68 68v180H196c-31 0-56-25-56-56V132z" fill="#ffffff" opacity="0.96"/>
+  <path d="M176 172h150M176 220h150M176 268h116" stroke="#2454d6" stroke-width="24" stroke-linecap="round"/>
+  <circle cx="356" cy="350" r="54" fill="#0f172a"/>
+  <path d="M332 350l18 18 34-42" fill="none" stroke="#ffffff" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
