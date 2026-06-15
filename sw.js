@@ -1,15 +1,16 @@
-const CACHE_NAME = 'english-reading-trainer-v6-library-ui';
+const CACHE_NAME = 'english-reading-trainer-v7-manual-200';
 const APP_ASSETS = [
   './',
   './index.html',
-  './css/style.css?v=library-ui-20260616',
-  './js/passages.js?v=library-ui-20260616',
-  './js/generated-passages.js?v=library-ui-20260616',
-  './js/curated-passages.js?v=library-ui-20260616',
-  './js/activate-generated-bank.js?v=library-ui-20260616',
-  './js/app.js?v=library-ui-20260616',
-  './manifest.json?v=library-ui-20260616',
-  './icons/icon.svg?v=library-ui-20260616'
+  './css/style.css?v=manual-200-20260616',
+  './js/passages.js?v=manual-200-20260616',
+  './js/manual-passages.js?v=manual-200-20260616',
+  './js/generated-passages.js?v=manual-200-20260616',
+  './js/curated-passages.js?v=manual-200-20260616',
+  './js/activate-generated-bank.js?v=manual-200-20260616',
+  './js/app.js?v=manual-200-20260616',
+  './manifest.json?v=manual-200-20260616',
+  './icons/icon.svg?v=manual-200-20260616'
 ];
 
 self.addEventListener('install', (event) => {
