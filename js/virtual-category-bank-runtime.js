@@ -1,5 +1,6 @@
 (function () {
   const STORE_KEY = 'ert_virtual_category_offsets_v1';
+  const FRONT_BATCH_SIZE = 20;
 
   const CATEGORY_OPTIONS = {
     curated: {
@@ -25,6 +26,10 @@
     }
   };
 
+  function hasApp() {
+    return typeof app !== 'undefined' && Array.isArray(app.passages);
+  }
+
   function readOffsets() {
     try { return JSON.parse(localStorage.getItem(STORE_KEY)) || {}; } catch { return {}; }
   }
@@ -33,10 +38,10 @@
     localStorage.setItem(STORE_KEY, JSON.stringify(offsets));
   }
 
-  function nextOffset(category) {
+  function nextOffset(category, count) {
     const offsets = readOffsets();
     const current = Number(offsets[category] || ({ curated: 2100000, manual: 3100000, generated: 4100000 }[category] || 5100000));
-    offsets[category] = current + 1;
+    offsets[category] = current + count;
     writeOffsets(offsets);
     return current;
   }
@@ -46,9 +51,19 @@
     return pool[index % pool.length];
   }
 
+  function isOldBulkGenerated(p) {
+    const source = String(p?.source || '').toLowerCase();
+    return source.includes('original_generated_10000_bank') || source.includes('generated_10000');
+  }
+
+  function isManagedVirtualCategory(p, category) {
+    const source = String(p?.source || '').toLowerCase();
+    return p?.category === category && source.includes('virtual_');
+  }
+
   function makeBatch(category, count, options) {
     const config = CATEGORY_OPTIONS[category] || CATEGORY_OPTIONS.generated;
-    const start = nextOffset(category);
+    const start = nextOffset(category, count);
     const batch = [];
     for (let i = 0; i < count; i += 1) {
       const level = options?.level || pickLevel(config, start + i);
@@ -66,21 +81,24 @@
   }
 
   function removeOldBulkGenerated() {
-    if (!window.app || !Array.isArray(app.passages)) return;
-    app.passages = app.passages.filter((p) => {
-      const source = String(p.source || '').toLowerCase();
-      return !(source.includes('original_generated_10000_bank') || source.includes('generated_10000'));
-    });
+    if (!hasApp()) return;
+    app.passages = app.passages.filter((p) => !isOldBulkGenerated(p));
+  }
+
+  function keepOnlyOneFrontBatch(category, newItems) {
+    if (!hasApp()) return;
+    app.passages = app.passages.filter((p) => !isManagedVirtualCategory(p, category));
+    app.passages = newItems.concat(app.passages || []);
+    app.visibleLimit = FRONT_BATCH_SIZE;
   }
 
   function addVirtualCategoryBatch(category, options = {}) {
-    if (typeof window.buildVirtualExamPassage !== 'function' || !window.app) return;
+    if (typeof window.buildVirtualExamPassage !== 'function' || !hasApp()) return;
     removeOldBulkGenerated();
-    const count = Number(options.count || 48);
-    const batch = makeBatch(category, count, options);
+    const batch = makeBatch(category, FRONT_BATCH_SIZE, options);
     const normalized = typeof normalizePassages === 'function' ? normalizePassages(batch) : batch;
     normalized.forEach((p) => { p.category = category; });
-    app.passages = normalized.concat(app.passages || []);
+    keepOnlyOneFrontBatch(category, normalized);
 
     const categoryFilter = document.getElementById('categoryFilter');
     if (categoryFilter) categoryFilter.value = category;
@@ -97,7 +115,7 @@
 
     const msg = document.getElementById('virtualCategoryMessage');
     const label = CATEGORY_OPTIONS[category]?.label || '训练内容';
-    if (msg) msg.textContent = `已换入一批新的${label}文章，并自动切换到对应训练列表。`;
+    if (msg) msg.textContent = `已换入 20 篇新的${label}文章，并自动切换到对应训练列表。`;
   }
 
   function updateCategoryLabels() {
@@ -115,9 +133,9 @@
     };
     window.categoryDescription = function categoryDescription(category) {
       return {
-        curated: '按需生成的高质量强化训练，偏正式考试阅读。',
-        generated: '按需生成的高难拓展训练，覆盖多学科考试文章。',
-        manual: '按需生成的样例训练，适合基础过渡和功能测试。',
+        curated: '每次展示 20 篇精选强化文章，不满意可换一批。',
+        generated: '每次展示 20 篇高难拓展文章，不满意可换一批。',
+        manual: '每次展示 20 篇人工样例风格文章，不满意可换一批。',
         custom: '你导入的文章，保存在当前浏览器中。'
       }[category] || '';
     };
@@ -125,7 +143,7 @@
 
   function installVirtualCategoryPanel() {
     if (document.getElementById('virtualCategoryPanel')) return;
-    const anchor = document.getElementById('virtualBankPanel') || document.getElementById('examModePanel') || document.querySelector('.filter-panel');
+    const anchor = document.getElementById('examModePanel') || document.querySelector('.filter-panel');
     if (!anchor || !anchor.parentNode) return;
     const panel = document.createElement('section');
     panel.id = 'virtualCategoryPanel';
@@ -135,7 +153,7 @@
       <div class="section-title-row">
         <div>
           <h2>按需换题库</h2>
-          <p>精选强化、人工样例、拓展训练都使用虚拟无限题库。点击后只显示新换入的对应训练内容，不再被旧大题库淹没。</p>
+          <p>精选强化、人工样例、拓展训练前台统一只展示 20 篇。觉得不合适就换一批，不再堆满页面。</p>
         </div>
       </div>
       <div class="virtual-category-actions">
@@ -143,12 +161,28 @@
         <button class="secondary-btn" data-virtual-category="generated">换一批拓展训练</button>
         <button class="ghost-btn" data-virtual-category="manual">换一批人工样例</button>
       </div>
-      <p id="virtualCategoryMessage" class="message">推荐先用“精选强化”训练，再用“拓展训练”刷高难文章。</p>
+      <p id="virtualCategoryMessage" class="message">每个入口只展示 20 篇，换一批会替换当前组。</p>
     `;
     anchor.parentNode.insertBefore(panel, anchor.nextSibling);
     panel.querySelectorAll('[data-virtual-category]').forEach((button) => {
-      button.addEventListener('click', () => addVirtualCategoryBatch(button.dataset.virtualCategory, { count: 60, focus: 'user_switch' }));
+      button.addEventListener('click', () => addVirtualCategoryBatch(button.dataset.virtualCategory, { focus: 'user_switch' }));
     });
+  }
+
+  function bootstrapFrontBatches() {
+    if (!hasApp()) return;
+    removeOldBulkGenerated();
+    if (!sessionStorage.getItem('ert_virtual_category_bootstrap_v2')) {
+      addVirtualCategoryBatch('curated', { focus: 'bootstrap' });
+      addVirtualCategoryBatch('generated', { focus: 'bootstrap' });
+      addVirtualCategoryBatch('manual', { focus: 'bootstrap' });
+      sessionStorage.setItem('ert_virtual_category_bootstrap_v2', '1');
+      const categoryFilter = document.getElementById('categoryFilter');
+      if (categoryFilter) categoryFilter.value = 'curated';
+      if (typeof renderCards === 'function') renderCards(true);
+    } else {
+      if (typeof renderCards === 'function') renderCards(true);
+    }
   }
 
   window.addVirtualCategoryBatch = addVirtualCategoryBatch;
@@ -157,15 +191,8 @@
   window.addEventListener('load', function () {
     setTimeout(function () {
       updateCategoryLabels();
-      removeOldBulkGenerated();
       installVirtualCategoryPanel();
-      if (!sessionStorage.getItem('ert_virtual_category_bootstrap')) {
-        addVirtualCategoryBatch('curated', { count: 36, focus: 'bootstrap' });
-        addVirtualCategoryBatch('generated', { count: 36, focus: 'bootstrap' });
-        sessionStorage.setItem('ert_virtual_category_bootstrap', '1');
-      } else {
-        if (typeof renderCards === 'function') renderCards(true);
-      }
+      bootstrapFrontBatches();
     }, 420);
   });
 })();
