@@ -1,0 +1,56 @@
+.mobile-quick-batch-bar {
+  position: fixed;
+  left: 50%;
+  bottom: 94px;
+  transform: translateX(-50%);
+  z-index: 110;
+  width: min(520px, calc(100% - 22px));
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 10px;
+  align-items: center;
+  padding: 10px;
+  border-radius: 22px;
+  background: rgba(255,255,255,.92);
+  border: 1px solid rgba(49,87,246,.14);
+  box-shadow: 0 18px 50px rgba(15,23,42,.18);
+  backdrop-filter: blur(18px);
+}
+
+.mobile-quick-batch-bar button {
+  min-height: 42px;
+  border-radius: 16px;
+  white-space: nowrap;
+}
+
+.mobile-quick-batch-bar span {
+  font-size: 12px;
+  color: #667085;
+  font-weight: 800;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+body.modern-app-shell {
+  padding-bottom: 154px;
+}
+
+@media (min-width: 900px) {
+  .mobile-quick-batch-bar {
+    width: 420px;
+    right: 24px;
+    left: auto;
+    transform: none;
+  }
+}
+
+@media (max-width: 520px) {
+  .mobile-quick-batch-bar {
+    grid-template-columns: 1fr;
+    bottom: 86px;
+  }
+  .mobile-quick-batch-bar span {
+    text-align: center;
+  }
+}
