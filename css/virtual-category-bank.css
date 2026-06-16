@@ -1,0 +1,20 @@
+.virtual-category-panel {
+  border: 1px solid rgba(49, 87, 246, .16);
+}
+
+.virtual-category-actions {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.virtual-category-actions button {
+  min-height: 50px;
+}
+
+@media (max-width: 760px) {
+  .virtual-category-actions {
+    grid-template-columns: 1fr;
+  }
+}
