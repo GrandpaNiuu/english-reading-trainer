@@ -1,6 +1,7 @@
 /* Topic coverage + mobile usability controller. Load last. */
 (function () {
   const FRONT_LIMIT = 20;
+  const RECENT_LIMIT = 4000;
   const TOPICS = [
     ['community safety', 'emergency preparedness', 'neighborhood response', 'residents', 'safety reports'],
     ['school', 'classroom routines', 'learning situations', 'students and teachers', 'classroom observations'],
@@ -50,6 +51,10 @@
     manual: { label: '人工样例', levels: ['A2', 'B1', 'B2', 'C1'], source: 'virtual_manual_topic_bank' }
   };
 
+  const STRUCTURES = ['problem-solution', 'cause-effect', 'compare-contrast', 'claim-evidence', 'case-study', 'debate-and-resolution', 'chronological development', 'classification'];
+  const ANGLES = ['evidence', 'public response', 'hidden costs', 'long-term change', 'competing explanations', 'practical limits', 'unexpected results', 'institutional change', 'local adaptation', 'ethical questions', 'resource pressure', 'future planning'];
+  const SCENARIOS = ['policy meeting', 'research project', 'community trial', 'school program', 'field investigation', 'public survey', 'case review', 'pilot study', 'expert debate', 'long-term observation', 'training workshop', 'regional comparison'];
+
   function hasApp() { return typeof app !== 'undefined' && Array.isArray(app.passages); }
   function h(v) { let x = 2166136261; String(v || '').split('').forEach((c) => { x ^= c.charCodeAt(0); x += (x << 1) + (x << 4) + (x << 7) + (x << 8) + (x << 24); }); return x >>> 0; }
   function rng(seed) { let s = seed >>> 0; return () => ((s = (s * 1664525 + 1013904223) >>> 0) / 4294967296); }
@@ -60,18 +65,46 @@
   function currentCategory() { return document.getElementById('categoryFilter')?.value || 'curated'; }
   function currentTopic() { return document.getElementById('topicFilter')?.value || 'all'; }
   function labelFor(c) { return { curated: '精选强化', generated: '拓展训练', manual: '人工样例', custom: '自定义导入', all: '训练内容' }[c] || '训练内容'; }
+  function cleanCategory(c) { return (c === 'all' || c === 'custom') ? 'curated' : c; }
+
+  function recentKey(c, t) { return `ert_recent_batch_indexes_${c}_${t}`; }
+  function offsetKey(c, t) { return `ert_topic_mobile_offset_${c}_${t}`; }
+  function readRecent(c, t) { try { return JSON.parse(localStorage.getItem(recentKey(c, t))) || []; } catch { return []; } }
+  function writeRecent(c, t, values) { localStorage.setItem(recentKey(c, t), JSON.stringify(values.slice(-RECENT_LIMIT))); }
+  function readOffset(c, t) { return Number(localStorage.getItem(offsetKey(c, t)) || (h(`${c}|${t}`) % 5000000 + 5000000)); }
+  function writeOffset(c, t, v) { localStorage.setItem(offsetKey(c, t), String(v)); }
+
+  function nextUniqueIndexes(c, t, count) {
+    const recent = new Set(readRecent(c, t));
+    const picked = [];
+    let cursor = readOffset(c, t);
+    let guard = 0;
+    while (picked.length < count && guard < count * 200) {
+      const candidate = cursor + guard;
+      if (!recent.has(candidate)) {
+        picked.push(candidate);
+        recent.add(candidate);
+      }
+      guard += 1;
+    }
+    writeOffset(c, t, cursor + guard + count);
+    writeRecent(c, t, Array.from(recent));
+    return picked;
+  }
 
   function makePassage(category, topicKey, index) {
-    const t = topicByKey(topicKey === 'all' ? TOPICS[index % TOPICS.length][0] : topicKey);
-    const r = rng(h(`${category}|${topicKey}|${index}|topic-mobile`));
+    const topicSeed = topicKey === 'all' ? TOPICS[(index + h(category)) % TOPICS.length][0] : topicKey;
+    const t = topicByKey(topicSeed);
+    const r = rng(h(`${category}|${topicKey}|${index}|no-repeat-topic-mobile-v2`));
     const cfg = CATEGORY[category] || CATEGORY.curated;
     const level = cfg.levels[index % cfg.levels.length];
-    const structure = pick(['problem-solution', 'cause-effect', 'compare-contrast', 'claim-evidence', 'case-study', 'debate-and-resolution'], r);
-    const angle = pick(['evidence', 'public response', 'hidden costs', 'long-term change', 'competing explanations', 'practical limits'], r);
-    const title = `${titleCase(t[1])}: ${titleCase(angle)}`;
-    const p1 = `The topic of this passage is ${t[0]}. A common question in ${t[2]} is how ${t[1]} should be understood when ${t[3]} must make decisions from incomplete evidence.`;
-    const p2 = `At first, the situation may seem simple. However, ${t[4]} often show that the problem has several layers, especially when timing, local conditions, and public expectations are considered together.`;
-    const p3 = `One view emphasizes immediate action, while another stresses careful interpretation. This contrast matters because weak evidence can lead to fast but misleading conclusions.`;
+    const structure = pick(STRUCTURES, r);
+    const angle = pick(ANGLES, r);
+    const scenario = pick(SCENARIOS, r);
+    const title = `${titleCase(t[1])}: ${titleCase(angle)} in a ${titleCase(scenario)}`;
+    const p1 = `The topic of this passage is ${t[0]}. In a recent ${scenario}, ${t[3]} considered how ${t[1]} should be understood when decisions had to be made from incomplete evidence.`;
+    const p2 = `At first, the situation appeared ordinary. However, ${t[4]} showed that the problem had several layers, especially when timing, local conditions, and public expectations were considered together.`;
+    const p3 = `One interpretation emphasized immediate action, while another stressed careful analysis. This contrast matters because weak evidence can lead to fast but misleading conclusions.`;
     const p4 = `The passage follows a ${structure} structure. It introduces a situation, examines evidence, and limits the final claim rather than offering a single easy answer.`;
     const passage = [p1, p2, p3, p4].join('\n\n');
     return {
@@ -97,15 +130,12 @@
 
   function isManaged(p, category) { return p?.category === category && String(p.source || '').includes('topic_bank'); }
   function isOldBulk(p) { const s = String(p?.source || '').toLowerCase(); return s.includes('original_generated_10000_bank') || s.includes('generated_10000'); }
-  function offsetKey(c, t) { return `ert_topic_mobile_offset_${c}_${t}`; }
-  function nextOffset(c, t) { const key = offsetKey(c, t); const cur = Number(localStorage.getItem(key) || (h(`${c}|${t}`) % 5000000 + 5000000)); localStorage.setItem(key, String(cur + FRONT_LIMIT)); return cur; }
 
   function replaceBatch(category = currentCategory(), topic = currentTopic()) {
     if (!hasApp()) return;
-    if (category === 'all' || category === 'custom') category = 'curated';
-    const start = nextOffset(category, topic);
-    const batch = [];
-    for (let i = 0; i < FRONT_LIMIT; i += 1) batch.push(makePassage(category, topic, start + i));
+    category = cleanCategory(category);
+    const indexes = nextUniqueIndexes(category, topic, FRONT_LIMIT);
+    const batch = indexes.map((idx) => makePassage(category, topic, idx));
     const normalized = typeof normalizePassages === 'function' ? normalizePassages(batch) : batch;
     normalized.forEach((p) => { p.category = category; });
     app.passages = (app.passages || []).filter((p) => !isOldBulk(p) && !isManaged(p, category));
@@ -115,8 +145,9 @@
     const level = document.getElementById('levelFilter'); if (level) level.value = 'all';
     const search = document.getElementById('searchInput'); if (search) search.value = '';
     renderCards(true);
-    const msg = document.getElementById('virtualCategoryMessage') || document.getElementById('mobileBatchHint');
-    if (msg) msg.textContent = `已换入 20 篇${labelFor(category)} · ${topic === 'all' ? '混合主题' : topic}`;
+    const text = `已换入 20 篇${labelFor(category)} · ${topic === 'all' ? '混合主题' : topic}，不会回到最近批次`;
+    const msg = document.getElementById('virtualCategoryMessage'); if (msg) msg.textContent = text;
+    const hint = document.getElementById('mobileBatchHint'); if (hint) hint.textContent = text;
   }
 
   window.populateTopicFilter = function populateTopicFilter() {
@@ -190,6 +221,7 @@
   }
 
   window.addVirtualCategoryBatch = (category) => replaceBatch(category || currentCategory(), currentTopic());
+  window.replaceCurrentTopicBatch = () => replaceBatch(currentCategory(), currentTopic());
 
   window.addEventListener('load', function () {
     setTimeout(() => {
