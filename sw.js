@@ -1,4 +1,4 @@
-const CACHE_NAME = 'english-reading-trainer-v21-virtual-category';
+const CACHE_NAME = 'english-reading-trainer-v22-front-20';
 const APP_ASSETS = [
   './',
   './index.html',
